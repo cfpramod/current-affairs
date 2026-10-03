@@ -17,6 +17,19 @@
   --space: 14px;
   --radius: 8px;
 }
+[hidden] {
+  display: none !important;
+}
+.request-chain {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space);
+}
+.operator-reason {
+  border-left: 4px solid var(--accent);
+  padding-left: 14px;
+  margin: 0;
+}
 * {
   box-sizing: border-box;
 }
@@ -290,7 +303,8 @@ textarea {
     padding: 16px;
   }
   .grid,
-  .workbench {
+  .workbench,
+  .request-chain {
     grid-template-columns: 1fr;
   }
   .big {

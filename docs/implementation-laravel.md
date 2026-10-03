@@ -8,9 +8,18 @@ Read [BUILD_INTEGRATION.md](BUILD_INTEGRATION.md) and [LOCAL_APP.md](LOCAL_APP.m
 
 ## Implement next
 
+The read-only `/integration/batches` dashboard from @matla91 is now included.
+Use its stored evidence connection as the foundation and adapt its styling to the
+existing site. The [QA and logistics wireframes](design/approver-wireframes.md)
+specify the remaining flow: operator submits an action and reason (which may
+override the model); QA/logistics accepts or denies with a separate reason;
+acceptance states the next action and confirms responsibility. Retain the exact
+assessment reference, both reasons and the chosen action. This approval workflow
+is a design reference, not implemented by the read-only dashboard.
+
 1. Import [synthetic operations](../data/examples/operations/README.md) using a repeatable seeder/import command. Retain integer primary keys and store stable fixture IDs as unique external references. Add materials, batches, incoming supply plans, inventory lots, stock reservations and shipment readings. Resolve relationships from external references, not record order.
 2. Support `planned` shipments and nullable actual departure/arrival. Keep planned and actual milestones separate. Reactor and charge time belong to the batch; a shipment may supply several batches.
-3. Build batch list/detail pages showing quantity/deadline, incoming shipments, released reserved stock, shortfall and QA availability separately. Show the latest linked assessment, or pending when unavailable. Seeded workflow status is not an ML readiness verdict.
+3. Adapt the included batch assessment page to the existing site and connect operational batch navigation/imports. Preserve separate quantity/deadline, incoming shipment, reserved stock, shortfall and QA evidence. Seeded workflow status is not an ML readiness verdict.
 4. Import the ML builder's batch-linked results idempotently by assessment hash and external batch/shipment IDs once its additive contract exists. Preserve full evidence. Record operator/logistics/QA decisions against that exact assessment, with reasons for overrides. Preserve current role checks and decision history.
 
 ## Boundaries

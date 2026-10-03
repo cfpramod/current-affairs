@@ -8,6 +8,17 @@ document.querySelectorAll("[data-decision]").forEach((button) => {
     form.reset();
     dialog.querySelector("h2").textContent = button.dataset.decision;
     dialog.querySelector("[data-context]").textContent = button.dataset.context;
+    const accepting = button.dataset.outcome === "accept";
+    const nextStep = dialog.querySelector("[data-next-step]");
+    nextStep.hidden = !accepting;
+    form.elements.next_action.required = accepting;
+    form.elements.next_action.value = button.dataset.nextAction || "";
+    dialog.querySelector("[data-confirmation]").textContent = accepting
+      ? "I accept the operator’s request and confirm we will take the next action stated above."
+      : "I deny the operator’s request with this reason and will return it to the operator for review.";
+    dialog.querySelector("[data-submit-review]").textContent = accepting
+      ? "Preview acceptance"
+      : "Preview denial";
     dialog.querySelector("[data-error]").textContent = "";
     dialog.showModal();
   });
@@ -15,16 +26,31 @@ document.querySelectorAll("[data-decision]").forEach((button) => {
 dialog
   .querySelector("[data-cancel]")
   .addEventListener("click", () => dialog.close());
-form.addEventListener("submit", (event) => {
+function previewDecision(event) {
   event.preventDefault();
   const reason = form.elements.reason.value.trim();
-  if (!reason || !form.elements.reviewed.checked) {
+  const accepting = trigger.dataset.outcome === "accept";
+  const nextAction = form.elements.next_action.value.trim();
+  if (
+    !reason ||
+    !form.elements.reviewed.checked ||
+    (accepting && !nextAction)
+  ) {
     dialog.querySelector("[data-error]").textContent =
-      "Add a reason and confirm that you reviewed the evidence.";
+      "Add a decision reason, state the next action when accepting, and confirm your decision.";
     return;
   }
   const log = trigger.closest(".card").querySelector("[data-log]");
-  log.textContent = `Preview only · ${trigger.dataset.decision} · Reason: ${reason}. No workflow changed.`;
+  log.textContent = `Preview only · ${trigger.dataset.decision} · Approver reason: ${reason} · ${
+    accepting
+      ? `Next action: ${nextAction} Approver confirms responsibility for this next step.`
+      : "Return to the operator with this reason; no substitute action is authorized."
+  } No workflow changed.`;
   dialog.close();
   log.focus();
-});
+}
+dialog.addEventListener("submit", previewDecision);
+dialog
+  .querySelector("[data-submit-review]")
+  .addEventListener("click", previewDecision);
+document.documentElement.dataset.reviewReady = "true";

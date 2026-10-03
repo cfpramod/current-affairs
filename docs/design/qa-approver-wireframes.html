@@ -42,10 +42,42 @@
               ><span class="tag">PENDING QA</span>
             </div>
           </div>
-          <h2>Review quarantine for the incoming lot</h2>
+          <h2>Accept or deny the operator’s quarantine request</h2>
           <div class="meta">
             Requested by operator · Heat exposure during handover · 03 Oct,
             12:00 UTC
+          </div>
+          <div class="request-chain">
+            <div class="box">
+              <div class="eyebrow">MODEL RECOMMENDATION</div>
+              <h3>QUARANTINE</h3>
+              <div class="note">
+                Illustrative workflow recommendation; not a change to the four
+                null-action acceptance records.
+              </div>
+            </div>
+            <div class="box">
+              <div class="eyebrow">OPERATOR SELECTED</div>
+              <h3>QUARANTINE</h3>
+              <div>Submitted to QA · follows recommendation</div>
+            </div>
+            <div class="box recommendation">
+              <div class="eyebrow">QA APPROVER</div>
+              <h3>Awaiting decision</h3>
+              <div>Accept or deny · reason required for both</div>
+            </div>
+          </div>
+          <div class="box">
+            <h3>Operator’s reason</h3>
+            <blockquote class="operator-reason">
+              “The sampled excursion exceeds the allowance. I propose
+              quarantining this lot while QA reviews the deviation and
+              supporting evidence.”
+            </blockquote>
+            <div class="note">
+              Illustrative operator submission · linked to request QAR-DEMO-02
+              and the reviewed evidence snapshot.
+            </div>
           </div>
           <div class="grid">
             <div class="box danger">
@@ -73,25 +105,29 @@
           </div>
           <div class="box recommendation stack">
             <div class="eyebrow">REQUESTED DECISION · QA owns disposition</div>
-            <h3>Confirm quarantine while the deviation is investigated</h3>
+            <h3>Do we accept the operator’s proposed quarantine?</h3>
             <div>
-              Confirm the hold request, return it for more evidence, or
-              escalate. Release is a separate QA disposition with its own
-              supporting evidence.
+              Accept or deny the submitted action, with your own reason. On
+              acceptance, confirm the next action QA will take. On denial,
+              return the reason to the operator; denial does not release the
+              lot.
             </div>
             <div class="buttons">
               <button
                 class="primary"
-                data-decision="Confirm quarantine"
+                data-decision="Accept operator request: QUARANTINE"
+                data-outcome="accept"
+                data-next-action="Initiate the quarantine disposition process, record the deviation and notify the operator of the QA review plan."
                 data-context="Lot DEMO-HEAT-02 · QA request QAR-DEMO-02 · assessment snapshot DEMO-ASMT-02"
               >
-                Confirm quarantine…</button
+                Accept request…</button
               ><button
                 class="secondary"
-                data-decision="Request more evidence"
+                data-decision="Deny operator request: QUARANTINE"
+                data-outcome="deny"
                 data-context="Ask for the logger export, calibration and stability evidence; retain the hold pending review."
               >
-                Request evidence…
+                Deny request…
               </button>
             </div>
           </div>
@@ -237,11 +273,12 @@
               </details>
             </div>
             <aside class="box recommendation stack">
-              <div class="eyebrow">QA DECISION</div>
+              <div class="eyebrow">QA RESPONSE TO OPERATOR</div>
               <h3>Quarantine requested</h3>
               <p>
-                Review the observed excursion and uncertainty before deciding
-                the lot’s disposition.
+                Operator proposes QUARANTINE because the sampled excursion
+                exceeds the allowance. Review that reason and the evidence, then
+                accept or deny the request.
               </p>
               <div class="checklist">
                 <label
@@ -256,16 +293,19 @@
               </div>
               <button
                 class="primary"
-                data-decision="Confirm quarantine"
+                data-decision="Accept operator request: QUARANTINE"
+                data-outcome="accept"
+                data-next-action="Initiate the quarantine disposition process, record the deviation and notify the operator of the QA review plan."
                 data-context="QA workbench · DEMO-HEAT-02 · save rationale against the reviewed snapshot in implementation."
               >
-                Confirm quarantine…</button
+                Accept request…</button
               ><button
                 class="secondary"
-                data-decision="Escalate deviation review"
+                data-decision="Deny operator request: QUARANTINE"
+                data-outcome="deny"
                 data-context="Identify missing documents, specialist review or a required stability assessment."
               >
-                Escalate / request evidence…
+                Deny request…
               </button>
               <div class="note">
                 Release is a separate workflow; it is not authorized by this
@@ -274,8 +314,9 @@
             </aside>
           </div>
           <div class="log note" data-log tabindex="-1" aria-live="polite">
-            Audit trail · Requested → evidence reviewed → QA disposition →
-            operator notified. Prototype only.
+            Audit trail · Model recommendation → operator action + reason → QA
+            accept/deny + reason → confirmed next action → operator notified.
+            Prototype only.
           </div>
         </article>
       </section>
@@ -345,29 +386,41 @@
       </section>
     </main>
     <dialog aria-labelledby="review-title">
-      <form>
-        <h2 id="review-title">Review decision</h2>
+      <form onsubmit="return false;">
+        <h2 id="review-title">Review operator request</h2>
         <p data-context></p>
         <p class="note">
-          Prototype confirmation only. The implemented audit record should
-          include the QA request, lot, exact assessment, reviewer and time.
+          Preview only. The implemented record retains model recommendation,
+          operator action and reason, approver decision and reason, next action,
+          evidence snapshot and timestamps.
         </p>
-        <label for="reason">Decision reason / evidence requested</label
+        <label for="reason"
+          >Your reason for accepting or denying (required)</label
         ><textarea
           id="reason"
           name="reason"
           required
-          placeholder="What evidence supports this decision?"
+          placeholder="Why do you accept or deny the operator’s request?"
         ></textarea>
+        <div data-next-step>
+          <label for="next-action"
+            >Next action we will take (required on acceptance)</label
+          ><textarea
+            id="next-action"
+            name="next_action"
+            placeholder="State the next action your team commits to take."
+          ></textarea>
+        </div>
         <p>
           <label
-            ><input type="checkbox" name="reviewed" required /> I reviewed the
-            evidence and its limitations.</label
+            ><input type="checkbox" name="reviewed" required />
+            <span data-confirmation>Confirm your decision.</span></label
           >
         </p>
         <p data-error class="error" aria-live="polite"></p>
         <div class="buttons">
-          <button class="primary" type="submit">Preview decision</button
+          <button class="primary" type="button" data-submit-review>
+            Preview decision</button
           ><button class="secondary" type="button" data-cancel>Cancel</button>
         </div>
       </form>

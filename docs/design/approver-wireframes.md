@@ -16,8 +16,9 @@ required. This is a review artifact, not a replacement for the app's brand guide
 
 QA is lot-centric: quarantine request, product-temperature sample history,
 interpolation gaps, observed/reported excursion, material limits, calibration,
-stability and custody evidence, affected batches and prior disposition. Confirm
-quarantine, request evidence or escalate; release requires its own human QA process.
+stability and custody evidence, affected batches and prior disposition. QA accepts
+or denies the operator's proposed quarantine with its own reason; release remains
+a separate human QA process.
 The temperature drawing and queue are illustrative synthetic examples. Ambient
 proxies and arrival probabilities cannot establish product quality.
 
@@ -27,7 +28,18 @@ handling/refrigeration, receiving windows, cost and booking confirmation. The
 September 30 replay metrics come from the stored action demo documented in
 [BATCH_ASSESSMENTS.md](../BATCH_ASSESSMENTS.md). Reroute is unavailable in that
 profile; the design shows what evidence a separate reroute request would need.
-No alternate route or probability is invented.
+No alternate route or probability is invented. The logistics views show an
+illustrative override: model recommends EXPEDITE; operator selects REROUTE because
+the faster existing service is unavailable. The operator's reason remains visible
+beside the recommendation, selected action and evidence gaps.
+
+The approval flow is operator submission → role approver accepts or denies →
+operator notified. Preserve model recommendation, operator action and reason,
+approver outcome and reason separately. Both acceptance and denial require a
+reason. Acceptance additionally requires an explicit next action and confirmation
+that the approver's team will take it. Denial returns the reason to the operator;
+it does not authorize a substitute action or imply QA release. Acceptance of a
+logistics request does not imply a completed carrier booking or dispatch.
 
 Implementation should use the existing roles and exact assessment identity,
 record reason/reviewer/time, enforce required confirmations on the server and retain
