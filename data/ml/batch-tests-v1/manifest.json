@@ -1,0 +1,102 @@
+{
+  "counts": {
+    "batches": 1200,
+    "readings": 9637,
+    "shipments": 650
+  },
+  "dataset_id": "ml-batch-tests-v1",
+  "families": {
+    "future_planned": 100,
+    "late_arrival": 100,
+    "missing_readings": 100,
+    "partial_supply": 100,
+    "pending_qa": 100,
+    "quarantined_stock": 100,
+    "released_stock": 100,
+    "split_delivery": 100,
+    "stale_readings": 100,
+    "stock_competition": 100,
+    "stock_supply_overlap": 100,
+    "thermal_excursion": 100
+  },
+  "feature_columns": [
+    "required_quantity_kg",
+    "hours_to_charge",
+    "material_low_c",
+    "material_high_c",
+    "excursion_budget_min",
+    "reserved_released_kg",
+    "unreserved_released_kg",
+    "pending_stock_kg",
+    "quarantined_stock_kg",
+    "planned_incoming_kg",
+    "shipment_count",
+    "planned_shipments",
+    "arrived_shipments",
+    "planned_latest_arrival_hours",
+    "reading_count",
+    "latest_reading_age_min",
+    "observed_excursion_min"
+  ],
+  "files": {
+    "README.md": {
+      "sha256": "f17c14f29d45632d1ab0aa3992dc338fdb41703e5666eee154da653d6900698e"
+    },
+    "case_index.csv": {
+      "sha256": "c38581f39725025cb8c9d49876425ad2a402ebcf87a51d8a0cb60c2aefd96ab8"
+    },
+    "features.csv": {
+      "sha256": "c71ad64de144f62f9faf1d3683aa1c2c0122487b9226f82512a3316994de8cf8"
+    },
+    "hidden_outcomes.jsonl": {
+      "sha256": "5d224fe98e2498a45fa23615e8e2a6384f912b62a0a395ca0f3a624f4c92b865"
+    },
+    "labels.csv": {
+      "sha256": "03908bc50f2a7531fe2335dd9c346285116e43782a67921572223c6800aae1dc"
+    },
+    "quickstart.py": {
+      "sha256": "cab93c2098889bd5a76b1783f963334acb18e90f77122d4e44dd049cc7ab9b8b"
+    },
+    "snapshots.jsonl": {
+      "sha256": "d84da70bc5ead466f7022dff12810176d7875ddd925c83a0db36dae93017df7f"
+    }
+  },
+  "generation_settings": {
+    "dataset_id": "ml-batch-tests-v1",
+    "first_cutoff": "2025-02-11T12:00:00+00:00",
+    "groups": 600,
+    "reading_interval_min": 60,
+    "seed": 20261003,
+    "stale_after_min": 120,
+    "train_fraction": 0.7,
+    "validation_fraction": 0.15
+  },
+  "generator_sha256": "915872dac9b485b2c6c773b6e8305fd0204f51a8d8682bcecc70c759bb5fa14b",
+  "groups": 600,
+  "labels": {
+    "incoming_all_on_time": {
+      "0": 437,
+      "1": 763
+    },
+    "synthetic_final_excursion_exceeded": {
+      "0": 1100,
+      "1": 100
+    },
+    "synthetic_ready_by_deadline": {
+      "0": 884,
+      "1": 316
+    },
+    "temperature_evidence_status": {
+      "exceeded_budget": 100,
+      "unknown": 300,
+      "within_observed_budget": 800
+    }
+  },
+  "seed": 20261003,
+  "simulated": true,
+  "splits": {
+    "test": 180,
+    "train": 840,
+    "validation": 180
+  }
+}

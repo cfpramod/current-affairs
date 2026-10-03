@@ -91,3 +91,7 @@ Changing the interface file needs a line in [docs/decisions.md](docs/decisions.m
 **Sunday 4 Oct, FHNW Campus Dreispitz:** doors 13:00, **submission 15:00**, demos from 15:30.
 
 Code: MIT (pending organiser confirmation). Data keeps its providers' terms.
+
+## Smartflow batch ML test package
+
+The [batch test package](data/ml/batch-tests-v1/README.md) adds 1,200 linked synthetic batches across twelve scenario families, separate input/target files, chronological shared-resource splits and a loading/baseline script. Download [the complete archive](data/ml/batch-tests-v1.zip). Generator/config/tests and implementation briefs are maintained on feat/build-integration. These are synthetic test assumptions, not measured production outcomes.
