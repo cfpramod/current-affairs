@@ -1,0 +1,883 @@
+{
+  "dataset_id": "operations-action-demo-v1",
+  "simulated": true,
+  "seed": 20261003,
+  "reference_at": "2026-09-30T12:00:00Z",
+  "materials": [
+    {
+      "id": "operations-action-demo-v1-material",
+      "name": "pharmaceutical intermediate",
+      "quantity_unit": "kg",
+      "range_c": [
+        2.0,
+        8.0
+      ],
+      "budget_min": 120.0
+    }
+  ],
+  "shipments": [
+    {
+      "id": "operations-action-demo-v1-shipment-001",
+      "material_id": "operations-action-demo-v1-material",
+      "lot_id": "operations-action-demo-v1-lot-001",
+      "quantity_kg": 150.0,
+      "route_mode": "river",
+      "origin": "Rotterdam",
+      "destination": "Basel production site",
+      "planned_departure_at": "2026-09-28T12:00:00Z",
+      "planned_arrival_at": "2026-09-29T06:00:00Z",
+      "actual_departure_at": "2026-09-28T12:00:00Z",
+      "actual_arrival_at": "2026-09-29T06:00:00Z",
+      "status": "arrived",
+      "scenario": "normal"
+    },
+    {
+      "id": "operations-action-demo-v1-shipment-002",
+      "material_id": "operations-action-demo-v1-material",
+      "lot_id": "operations-action-demo-v1-lot-002",
+      "quantity_kg": 150.0,
+      "route_mode": "river",
+      "origin": "Rotterdam",
+      "destination": "Basel production site",
+      "planned_departure_at": "2026-09-30T00:00:00Z",
+      "planned_arrival_at": "2026-09-30T18:00:00Z",
+      "actual_departure_at": "2026-09-30T00:00:00Z",
+      "actual_arrival_at": null,
+      "status": "in_transit",
+      "scenario": "heat"
+    },
+    {
+      "id": "operations-action-demo-v1-shipment-003",
+      "material_id": "operations-action-demo-v1-material",
+      "lot_id": "operations-action-demo-v1-lot-003",
+      "quantity_kg": 150.0,
+      "route_mode": "river",
+      "origin": "Rotterdam",
+      "destination": "Basel production site",
+      "planned_departure_at": "2026-09-30T00:00:00Z",
+      "planned_arrival_at": "2026-09-30T18:00:00Z",
+      "actual_departure_at": "2026-09-30T00:00:00Z",
+      "actual_arrival_at": null,
+      "status": "in_transit",
+      "scenario": "delay"
+    },
+    {
+      "id": "operations-action-demo-v1-shipment-004",
+      "material_id": "operations-action-demo-v1-material",
+      "lot_id": "operations-action-demo-v1-lot-004",
+      "quantity_kg": 150.0,
+      "route_mode": "river",
+      "origin": "Rotterdam",
+      "destination": "Basel production site",
+      "planned_departure_at": "2026-10-01T12:00:00Z",
+      "planned_arrival_at": "2026-10-02T06:00:00Z",
+      "actual_departure_at": null,
+      "actual_arrival_at": null,
+      "status": "planned",
+      "scenario": "planned"
+    }
+  ],
+  "batches": [
+    {
+      "id": "operations-action-demo-v1-batch-001",
+      "reactor": "R1",
+      "material_id": "operations-action-demo-v1-material",
+      "required_quantity_kg": 50.0,
+      "planned_charge_at": "2026-09-30T15:00:00Z",
+      "status": "planned"
+    },
+    {
+      "id": "operations-action-demo-v1-batch-002",
+      "reactor": "R2",
+      "material_id": "operations-action-demo-v1-material",
+      "required_quantity_kg": 50.0,
+      "planned_charge_at": "2026-09-30T18:00:00Z",
+      "status": "planned"
+    }
+  ],
+  "supply_plans": [
+    {
+      "batch_id": "operations-action-demo-v1-batch-001",
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "quantity_kg": 50.0
+    },
+    {
+      "batch_id": "operations-action-demo-v1-batch-002",
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "quantity_kg": 50.0
+    }
+  ],
+  "inventory": [
+    {
+      "id": "operations-action-demo-v1-stock-released",
+      "material_id": "operations-action-demo-v1-material",
+      "quantity_kg": 50.0,
+      "available_at": "2026-09-23T12:00:00Z",
+      "qa_status": "released",
+      "shipment_id": null
+    },
+    {
+      "id": "operations-action-demo-v1-stock-pending",
+      "material_id": "operations-action-demo-v1-material",
+      "quantity_kg": 100.0,
+      "available_at": "2026-09-29T12:00:00Z",
+      "qa_status": "pending",
+      "shipment_id": null
+    },
+    {
+      "id": "operations-action-demo-v1-lot-001",
+      "material_id": "operations-action-demo-v1-material",
+      "quantity_kg": 150.0,
+      "available_at": "2026-09-29T06:00:00Z",
+      "qa_status": "pending",
+      "shipment_id": "operations-action-demo-v1-shipment-001"
+    }
+  ],
+  "reservations": [
+    {
+      "batch_id": "operations-action-demo-v1-batch-001",
+      "inventory_lot_id": "operations-action-demo-v1-stock-released",
+      "quantity_kg": 50.0
+    }
+  ],
+  "readings": [
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T12:00:00Z",
+      "product_c": 5.051514,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T12:30:00Z",
+      "product_c": 5.047395,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T13:00:00Z",
+      "product_c": 5.043606,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T13:30:00Z",
+      "product_c": 5.040119,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T14:00:00Z",
+      "product_c": 5.036911,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T14:30:00Z",
+      "product_c": 5.03396,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T15:00:00Z",
+      "product_c": 5.031245,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T15:30:00Z",
+      "product_c": 5.028747,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T16:00:00Z",
+      "product_c": 5.026448,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T16:30:00Z",
+      "product_c": 5.024333,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T17:00:00Z",
+      "product_c": 5.022388,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T17:30:00Z",
+      "product_c": 5.020598,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T18:00:00Z",
+      "product_c": 5.018951,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T18:30:00Z",
+      "product_c": 5.017436,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T19:00:00Z",
+      "product_c": 5.016042,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T19:30:00Z",
+      "product_c": 5.014759,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T20:00:00Z",
+      "product_c": 5.013579,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T20:30:00Z",
+      "product_c": 5.012493,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T21:00:00Z",
+      "product_c": 5.011494,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T21:30:00Z",
+      "product_c": 5.010575,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T22:00:00Z",
+      "product_c": 5.00973,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T22:30:00Z",
+      "product_c": 5.008952,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T23:00:00Z",
+      "product_c": 5.008236,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-28T23:30:00Z",
+      "product_c": 5.007578,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T00:00:00Z",
+      "product_c": 5.006972,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T00:30:00Z",
+      "product_c": 5.006414,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T01:00:00Z",
+      "product_c": 5.005901,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T01:30:00Z",
+      "product_c": 5.00543,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T02:00:00Z",
+      "product_c": 5.004995,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T02:30:00Z",
+      "product_c": 5.004596,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T03:00:00Z",
+      "product_c": 5.004229,
+      "ambient_c": 20.0,
+      "refrigerated": false,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T03:30:00Z",
+      "product_c": 6.203224,
+      "ambient_c": 20.0,
+      "refrigerated": false,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T04:00:00Z",
+      "product_c": 7.306353,
+      "ambient_c": 20.0,
+      "refrigerated": false,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T04:30:00Z",
+      "product_c": 8.321281,
+      "ambient_c": 20.0,
+      "refrigerated": false,
+      "excursion_min": 9.76982
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T05:00:00Z",
+      "product_c": 9.25506,
+      "ambient_c": 20.0,
+      "refrigerated": false,
+      "excursion_min": 39.76982
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T05:30:00Z",
+      "product_c": 10.114178,
+      "ambient_c": 20.0,
+      "refrigerated": false,
+      "excursion_min": 69.76982
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-001",
+      "at": "2026-09-29T06:00:00Z",
+      "product_c": 10.904605,
+      "ambient_c": 20.0,
+      "refrigerated": false,
+      "excursion_min": 99.76982
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T00:00:00Z",
+      "product_c": 5.019739,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T00:30:00Z",
+      "product_c": 5.018161,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T01:00:00Z",
+      "product_c": 5.016709,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T01:30:00Z",
+      "product_c": 5.015373,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T02:00:00Z",
+      "product_c": 5.014144,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T02:30:00Z",
+      "product_c": 5.013013,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T03:00:00Z",
+      "product_c": 5.011972,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T03:30:00Z",
+      "product_c": 5.011015,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T04:00:00Z",
+      "product_c": 5.010134,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T04:30:00Z",
+      "product_c": 5.009324,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T05:00:00Z",
+      "product_c": 5.008579,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T05:30:00Z",
+      "product_c": 5.007893,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T06:00:00Z",
+      "product_c": 5.007262,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T06:30:00Z",
+      "product_c": 5.006681,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T07:00:00Z",
+      "product_c": 5.006147,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T07:30:00Z",
+      "product_c": 5.005655,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T08:00:00Z",
+      "product_c": 5.005203,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T08:30:00Z",
+      "product_c": 5.004787,
+      "ambient_c": 40.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T09:00:00Z",
+      "product_c": 5.004404,
+      "ambient_c": 40.0,
+      "refrigerated": false,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T09:30:00Z",
+      "product_c": 7.802498,
+      "ambient_c": 40.0,
+      "refrigerated": false,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T10:00:00Z",
+      "product_c": 10.376868,
+      "ambient_c": 40.0,
+      "refrigerated": false,
+      "excursion_min": 27.784928
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T10:30:00Z",
+      "product_c": 12.745403,
+      "ambient_c": 40.0,
+      "refrigerated": false,
+      "excursion_min": 57.784928
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T11:00:00Z",
+      "product_c": 14.92456,
+      "ambient_c": 40.0,
+      "refrigerated": false,
+      "excursion_min": 87.784928
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T11:30:00Z",
+      "product_c": 16.929481,
+      "ambient_c": 40.0,
+      "refrigerated": false,
+      "excursion_min": 117.784928
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-002",
+      "at": "2026-09-30T12:00:00Z",
+      "product_c": 18.774098,
+      "ambient_c": 40.0,
+      "refrigerated": false,
+      "excursion_min": 147.784928
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T00:00:00Z",
+      "product_c": 4.932703,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T00:30:00Z",
+      "product_c": 4.938084,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T01:00:00Z",
+      "product_c": 4.943034,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T01:30:00Z",
+      "product_c": 4.947589,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T02:00:00Z",
+      "product_c": 4.95178,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T02:30:00Z",
+      "product_c": 4.955635,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T03:00:00Z",
+      "product_c": 4.959182,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T03:30:00Z",
+      "product_c": 4.962446,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T04:00:00Z",
+      "product_c": 4.965449,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T04:30:00Z",
+      "product_c": 4.968211,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T05:00:00Z",
+      "product_c": 4.970753,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T05:30:00Z",
+      "product_c": 4.973091,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T06:00:00Z",
+      "product_c": 4.975243,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T06:30:00Z",
+      "product_c": 4.977222,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T07:00:00Z",
+      "product_c": 4.979043,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T07:30:00Z",
+      "product_c": 4.980719,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T08:00:00Z",
+      "product_c": 4.982261,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T08:30:00Z",
+      "product_c": 4.983679,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T09:00:00Z",
+      "product_c": 4.984984,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T09:30:00Z",
+      "product_c": 4.986185,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T10:00:00Z",
+      "product_c": 4.987289,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T10:30:00Z",
+      "product_c": 4.988306,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T11:00:00Z",
+      "product_c": 4.989241,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T11:30:00Z",
+      "product_c": 4.990101,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    },
+    {
+      "shipment_id": "operations-action-demo-v1-shipment-003",
+      "at": "2026-09-30T12:00:00Z",
+      "product_c": 4.990892,
+      "ambient_c": 20.0,
+      "refrigerated": true,
+      "excursion_min": 0.0
+    }
+  ],
+  "assumptions": {
+    "dataset_id": "operations-action-demo-v1",
+    "seed": 20261003,
+    "reference_at": "2026-09-30T12:00:00+00:00",
+    "shipments": 4,
+    "batches": 2,
+    "material_name": "pharmaceutical intermediate",
+    "quantity_unit": "kg",
+    "range_c": [
+      2,
+      8
+    ],
+    "budget_min": 120,
+    "setpoint_c": 5,
+    "tau_reefer_min": 360,
+    "tau_exposed_min": 360,
+    "shipment_quantity_kg": 150,
+    "batch_quantity_kg": 50,
+    "released_stock_kg": 50,
+    "pending_stock_kg": 100,
+    "route_duration_hours": 18,
+    "delay_hours": 24,
+    "departure_offsets_hours": [
+      -48,
+      -12,
+      24
+    ],
+    "batch_first_offset_hours": 3,
+    "batch_spacing_hours": 3,
+    "reading_interval_min": 30,
+    "exposure_final_hours": 3,
+    "heat_exposure_final_hours": 9,
+    "normal_ambient_c": 20,
+    "heat_ambient_c": 40,
+    "origin": "Rotterdam",
+    "destination": "Basel production site",
+    "reactors": [
+      "R1",
+      "R2",
+      "R3"
+    ]
+  }
+}

@@ -20,7 +20,7 @@ The API listens on localhost port 8002. The dashboard now has a project-local Pi
 
 The read API exposes `/api/integration/operations`, `/api/integration/assessments` and `/api/integration/assessments/{assessment_id}`. Contracts are generated from [interfaces.py](../pipeline/baselhack/interfaces.py), including [the assessment schema](../schemas/stored-logistics-assessment.schema.json). The worker preserves full normalized observations, scenario, assumptions, station selection, model version and detailed result in immutable evidence. Repeated identical analysis is idempotent; new inputs produce a new assessment ID. Bump the model version when calculation behavior changes.
 
-These are the three retrospective named logistics scenarios, not assessments of the 18 operational batches. They remain probabilities under simulation assumptions. Ambient exposure is not a measured product-temperature excursion. Do not map it into the shipment console's `p_excursion` field or authorize QA release from it. The model has missing-data/proxy warnings and seven existing verification gates remain open.
+The three named retrospective logistics scenarios remain available. The additive [batch worker and read API](BATCH_ASSESSMENTS.md) now join stored operations and expose stock, timing and product evidence separately. They remain probabilities under simulation assumptions. Ambient exposure is not a measured product-temperature excursion. Do not map it into the shipment console's `p_excursion` field or authorize QA release from it. The model has missing-data/proxy warnings and seven existing verification gates remain open.
 
 ## Builder implementation briefs
 
@@ -29,4 +29,10 @@ These are the three retrospective named logistics scenarios, not assessments of 
 
 ## Validation and remaining work
 
-Python integration tests exercise stored observations → model → immutable persistence → API, idempotency, fixture export and empty/missing results without network access. The project-local PHP/Composer setup now runs successfully. Laravel tests passed (58 passed, two skipped), Vue type checks and production build passed, and browser login plus the live integration page were verified. This branch is a reviewable connection, not a completed batch workflow or an approved merge.
+The batch layer from @matla91 is also included on `feat/build-integration`, with
+a separate historical BUFFER/EXPEDITE demo replay. See
+[BATCH_ASSESSMENTS.md](BATCH_ASSESSMENTS.md) for its inputs, commands and limits.
+The integrated engine passes 320 regression tests, with the seven existing
+verification gates deselected. Laravel batch display remains follow-up work.
+
+Python integration tests exercise stored observations → model → immutable persistence → API, idempotency, fixture export and empty/missing results without network access. On feat/batch-assessment-integration, the imported batch layer passes 319 regression tests with seven existing verification gates deselected; all four supplied reference records reproduce exactly. The earlier project-local PHP/Composer setup ran successfully: Laravel tests passed (58 passed, two skipped), Vue type checks and production build passed, and browser login plus the live integration page were verified. Laravel pages are unchanged by this batch-engine import. This branch is a reviewable connection, not a completed batch workflow or an approved merge.

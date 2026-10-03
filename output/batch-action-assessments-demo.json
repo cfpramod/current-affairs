@@ -1,0 +1,913 @@
+[
+  {
+    "assessment_id": "75fb056f7ff04729881be4d60eb02132f951c765ba527a2545073392d0b390d0",
+    "dataset_id": "operations-action-demo-v1",
+    "batch_id": "operations-action-demo-v1-batch-001",
+    "shipment_ids": [
+      "operations-action-demo-v1-shipment-001"
+    ],
+    "as_of": "2026-09-30T12:00:00Z",
+    "known_at": null,
+    "input_sha256": "85d4c3fe0b3608d65a67d5508d0acd4d00a542fa29ab6b0d87a07de3961081c9",
+    "model_version": "batch-stored-evidence-v2",
+    "production_readiness": {
+      "planned_charge_at": "2026-09-30T15:00:00Z",
+      "required_quantity_kg": 50.0,
+      "released_reserved_quantity_kg": 50.0,
+      "reservation_shortfall_kg": 0.0,
+      "incoming_dependency_kg": 0.0,
+      "uncovered_quantity_kg": 0.0,
+      "status": "RESERVED_STOCK_SUFFICIENT",
+      "stock_evidence": [
+        {
+          "inventory_lot_id": "operations-action-demo-v1-lot-001",
+          "quantity_kg": 150.0,
+          "reserved_for_batch_kg": 0.0,
+          "reserved_for_others_kg": 0.0,
+          "unreserved_quantity_kg": 150.0,
+          "eligible_reserved_quantity_kg": 0.0,
+          "qa_status": "pending",
+          "available_at": "2026-09-29T06:00:00Z",
+          "reason": "Pending-QA or quarantined stock is not released material."
+        },
+        {
+          "inventory_lot_id": "operations-action-demo-v1-stock-pending",
+          "quantity_kg": 100.0,
+          "reserved_for_batch_kg": 0.0,
+          "reserved_for_others_kg": 0.0,
+          "unreserved_quantity_kg": 100.0,
+          "eligible_reserved_quantity_kg": 0.0,
+          "qa_status": "pending",
+          "available_at": "2026-09-29T12:00:00Z",
+          "reason": "Pending-QA or quarantined stock is not released material."
+        },
+        {
+          "inventory_lot_id": "operations-action-demo-v1-stock-released",
+          "quantity_kg": 50.0,
+          "reserved_for_batch_kg": 50.0,
+          "reserved_for_others_kg": 0.0,
+          "unreserved_quantity_kg": 0.0,
+          "eligible_reserved_quantity_kg": 50.0,
+          "qa_status": "released",
+          "available_at": "2026-09-23T12:00:00Z",
+          "reason": "Released stock reserved to this batch is available by the charge time."
+        }
+      ]
+    },
+    "incoming_shipments": [
+      {
+        "shipment_id": "operations-action-demo-v1-shipment-001",
+        "planned_quantity_kg": 50.0,
+        "dependency_quantity_kg": 0.0,
+        "planned_arrival_at": "2026-09-29T06:00:00Z",
+        "actual_arrival_at": "2026-09-29T06:00:00Z",
+        "scheduled_after_charge": false,
+        "status": "ARRIVED",
+        "on_time_arrival_probability": 1.0,
+        "eta_p50": "2026-09-29T06:00:00Z",
+        "eta_p90": "2026-09-29T06:00:00Z",
+        "cold_chain_exposure_proxy_risk": null,
+        "logistics": null,
+        "reason": "Arrival is recorded by cutoff; exact timing is observed, not a model prediction. QA release remains separate."
+      }
+    ],
+    "product_temperature": [
+      {
+        "shipment_id": "operations-action-demo-v1-shipment-001",
+        "status": "OBSERVED_WITHIN_BUDGET",
+        "reading_count": 37,
+        "range_c": [
+          2.0,
+          8.0
+        ],
+        "budget_min": 120.0,
+        "first_reading_at": "2026-09-28T12:00:00Z",
+        "last_reading_at": "2026-09-29T06:00:00Z",
+        "last_product_c": 10.904605,
+        "last_product_outside_range": true,
+        "observed_excursion_min": 99.49666380275252,
+        "reported_excursion_min": 99.76982,
+        "unobserved_interval_min": 0.0,
+        "complete_journey": true,
+        "qa_release_authorized": false,
+        "limitations": [
+          "Product-temperature excursion uses piecewise-linear interpolation only between samples at most 60 minutes apart; this sampling assumption does not infer a physical thermal response.",
+          "No product temperature is extrapolated before the first or after the last reading. Unsampled intervals may contain additional excursion.",
+          "Reported cumulative excursion is source evidence retained separately; it is not treated as a directly measured duration or used for this status.",
+          "Material range and excursion budget are demonstration assumptions, not validated pharmaceutical QA release criteria. Human QA review is required for release; this assessment never authorizes it."
+        ]
+      }
+    ],
+    "recommendation": {
+      "action": "BUFFER",
+      "reason": "Released reserved stock covers the recorded batch demand by charge time; incoming timing and product evidence remain separate. Human QA review is required; no automatic quarantine or release is inferred.",
+      "requires_approval_by": "operator",
+      "qa_review_required": true,
+      "alternatives": [],
+      "qa_release_authorized": false
+    },
+    "provenance": [
+      {
+        "kind": "SIMULATED",
+        "provider": null,
+        "observed_at": "2026-09-30T12:00:00Z",
+        "source_indices": [],
+        "detail": "Persisted operational snapshot and shipment product readings; no generator labels used."
+      },
+      {
+        "kind": "REAL",
+        "provider": null,
+        "observed_at": null,
+        "source_indices": [
+          0,
+          1,
+          2
+        ],
+        "detail": "Stored external observations and retrieval metadata; no analysis-worker provider fetch."
+      },
+      {
+        "kind": "ASSUMED",
+        "provider": null,
+        "observed_at": null,
+        "source_indices": [],
+        "detail": "Immutable persisted configuration batch-default-v1; uncalibrated coefficients and sparse product-temperature interpolation."
+      }
+    ],
+    "real_data_sources": [
+      {
+        "provider": "Bundesamt f\u00fcr Umwelt BAFU via Open Data Basel-Stadt",
+        "dataset": "100089",
+        "url": "https://data.bs.ch/api/explore/v2.1/catalog/datasets/100089/records?limit=100&where=timestamp%3E%3Ddate%272026-09-30T00%3A00%3A00Z%27%20and%20timestamp%3C%3Ddate%272026-09-30T12%3A00%3A00Z%27&order_by=timestamp%20asc",
+        "retrieved_at": "2026-10-03T10:39:34.638139Z",
+        "licence": "CC0 1.0",
+        "real_data": true,
+        "sha256": "78cefb7d1f8a3e796c6aa38f44459f1ee14c28958ec6f8155ef952f05efae22a"
+      },
+      {
+        "provider": "Amt f\u00fcr Mobilit\u00e4t, Open Data Basel-Stadt",
+        "dataset": "100006",
+        "url": "https://data.bs.ch/api/explore/v2.1/catalog/datasets/100006/records?limit=100&select=zst_id,sitename,datetimefrom,datetimeto,directionname,lanecode,total,valuesapproved,valuesedited,weekday,hourfrom&where=zst_id%3D402%20and%20weekday%3D2%20and%20hourfrom%3D13%20and%20datetimefrom%3E%3Ddate%272026-07-01T00%3A00%3A00Z%27%20and%20datetimefrom%3C%3Ddate%272026-09-30T11%3A00%3A00Z%27&order_by=datetimefrom%20asc,lanecode%20asc",
+        "retrieved_at": "2026-10-03T10:39:34.579139Z",
+        "licence": "CC BY 4.0",
+        "real_data": true,
+        "sha256": "7a742c8823cc644666d49d8dcde499a5bc4a34665116784596d77d0fa97efd71"
+      },
+      {
+        "provider": "MeteoSwiss",
+        "dataset": "SwissMetNet BAS hourly observations",
+        "url": "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn/bas/ogd-smn_bas_h_recent.csv",
+        "retrieved_at": "2026-10-03T10:38:04.027057Z",
+        "licence": "CC BY 4.0; Source: MeteoSwiss",
+        "real_data": true,
+        "sha256": "06f651012668482a44055acee54628f30a00957e5758cfe8af28a231b20f2a26"
+      }
+    ],
+    "assumptions": {
+      "profile_id": "batch-default-v1",
+      "logistics": {
+        "assumed": true,
+        "n_runs": 10000,
+        "seed": 20260930,
+        "transport_sd_min": 25.0,
+        "handling_sd_min": 10.0,
+        "traffic_min_per_positive_z": 12.0,
+        "traffic_z_cap": 4.0,
+        "falling_level_min_per_cm_hour": 8.0,
+        "falling_discharge_min_per_m3_s_hour": 1.0,
+        "river_penalty_cap_min": 90.0,
+        "rain_min_per_mm": 4.0,
+        "wind_threshold_m_s": 10.0,
+        "wind_min_per_m_s": 3.0,
+        "delay_threshold_min": 15.0,
+        "ambient_reference_band_c": [
+          2.0,
+          8.0
+        ],
+        "exposure_budget_degree_min": 300.0,
+        "expedite_transport_factor": 0.75,
+        "expedite_handling_factor": 0.5,
+        "reroute_transport_min": 95.0,
+        "reroute_transport_sd_min": 20.0,
+        "reroute_extra_handling_min": 20.0,
+        "reroute_traffic_factor": 0.5,
+        "max_traffic_age_min": 90.0,
+        "max_rhine_age_min": 30.0,
+        "max_weather_age_min": 90.0,
+        "trend_window_min": 360.0,
+        "trend_min_span_min": 60.0,
+        "baseline_min_samples": 3,
+        "navigation_restricted_penalty_min": 30.0,
+        "navigation_severe_penalty_min": 60.0,
+        "route_block_delay_min": 1440.0,
+        "recommendation_policy": {
+          "target_production_continuity": 0.95,
+          "target_on_time_arrival": 0.9,
+          "max_exposure_proxy_risk": 0.1,
+          "sensitivity_factors": [
+            0.5,
+            1.5,
+            2.0
+          ]
+        }
+      },
+      "station_ids": [
+        "402"
+      ],
+      "origin": "Rotterdam",
+      "destination": "Basel production site",
+      "handling_min": 0.0,
+      "protection_remaining_min": 0.0,
+      "expedite_available": true,
+      "reroute_available": false,
+      "max_reading_gap_min": 60.0
+    },
+    "limitations": [
+      "Operations and product readings are synthetic demo evidence; material limits are demonstration assumptions, not pharmaceutical release policy.",
+      "QA and reservation state exists only at the operational snapshot reference time. Earlier historical states and the actual production decision at a past charge time cannot be reconstructed.",
+      "Released reservations are credited only when available by both cutoff and charge time. Unreserved stock and competing reservations are not automatically allocated.",
+      "Incoming dependency is prospective quantity coverage; arrivals and acceptable sampled temperatures do not imply QA release or production authorization.",
+      "Default observation selection uses latest stored revisions at the measurement cutoff, not knowledge available then. An explicit known_at filters stored retrieval history; operational capture history is unavailable.",
+      "Forward timing applies only to departed shipments in the configured corridor while planned remaining duration is positive; departure waits and overdue journeys require further evidence.",
+      "Timing/ambient Monte Carlo uses uncalibrated persisted assumptions. Protection autonomy is configured, not inferred from temperature samples; measured product exposure stays separate.",
+      "Action production-continuity probabilities are conditional timing events for one shipment, not batch QA/readiness probabilities. Multiple dependent shipments have no aggregate recommendation.",
+      "Seven existing domain/licence verification gates remain open."
+    ]
+  },
+  {
+    "assessment_id": "b62b24662a8871c70176ce9a1312c48664327c76f307ad98ef68d17f4a1bf8a1",
+    "dataset_id": "operations-action-demo-v1",
+    "batch_id": "operations-action-demo-v1-batch-002",
+    "shipment_ids": [
+      "operations-action-demo-v1-shipment-002"
+    ],
+    "as_of": "2026-09-30T12:00:00Z",
+    "known_at": null,
+    "input_sha256": "4056d339e8d47fa0c88939ea5c2b4238588c27733f22e50951cba8001348a733",
+    "model_version": "batch-stored-evidence-v2",
+    "production_readiness": {
+      "planned_charge_at": "2026-09-30T18:00:00Z",
+      "required_quantity_kg": 50.0,
+      "released_reserved_quantity_kg": 0.0,
+      "reservation_shortfall_kg": 50.0,
+      "incoming_dependency_kg": 50.0,
+      "uncovered_quantity_kg": 0.0,
+      "status": "INCOMING_DEPENDENT",
+      "stock_evidence": [
+        {
+          "inventory_lot_id": "operations-action-demo-v1-lot-001",
+          "quantity_kg": 150.0,
+          "reserved_for_batch_kg": 0.0,
+          "reserved_for_others_kg": 0.0,
+          "unreserved_quantity_kg": 150.0,
+          "eligible_reserved_quantity_kg": 0.0,
+          "qa_status": "pending",
+          "available_at": "2026-09-29T06:00:00Z",
+          "reason": "Pending-QA or quarantined stock is not released material."
+        },
+        {
+          "inventory_lot_id": "operations-action-demo-v1-stock-pending",
+          "quantity_kg": 100.0,
+          "reserved_for_batch_kg": 0.0,
+          "reserved_for_others_kg": 0.0,
+          "unreserved_quantity_kg": 100.0,
+          "eligible_reserved_quantity_kg": 0.0,
+          "qa_status": "pending",
+          "available_at": "2026-09-29T12:00:00Z",
+          "reason": "Pending-QA or quarantined stock is not released material."
+        },
+        {
+          "inventory_lot_id": "operations-action-demo-v1-stock-released",
+          "quantity_kg": 50.0,
+          "reserved_for_batch_kg": 0.0,
+          "reserved_for_others_kg": 50.0,
+          "unreserved_quantity_kg": 0.0,
+          "eligible_reserved_quantity_kg": 0.0,
+          "qa_status": "released",
+          "available_at": "2026-09-23T12:00:00Z",
+          "reason": "Stock is unreserved or reserved to another batch; no coverage credited."
+        }
+      ]
+    },
+    "incoming_shipments": [
+      {
+        "shipment_id": "operations-action-demo-v1-shipment-002",
+        "planned_quantity_kg": 50.0,
+        "dependency_quantity_kg": 50.0,
+        "planned_arrival_at": "2026-09-30T18:00:00Z",
+        "actual_arrival_at": null,
+        "scheduled_after_charge": false,
+        "status": "MODELED",
+        "on_time_arrival_probability": 0.3566,
+        "eta_p50": "2026-09-30T18:09:41.153046Z",
+        "eta_p90": "2026-09-30T18:42:51.084468Z",
+        "cold_chain_exposure_proxy_risk": 1.0,
+        "logistics": {
+          "shipment_id": "operations-action-demo-v1-shipment-002",
+          "as_of": "2026-09-30T12:00:00Z",
+          "predicted_delay_min": 15.79386802701461,
+          "delay_risk": 0.4164,
+          "cold_chain_exposure_proxy_risk": 1.0,
+          "action_success_probabilities": {
+            "BUFFER": 0.0,
+            "EXPEDITE": 0.0,
+            "REROUTE": 0.0
+          },
+          "actions": [
+            {
+              "action": "BUFFER",
+              "eligible": false,
+              "production_continuity_probability": 0.3566,
+              "on_time_arrival_probability": 0.3566,
+              "cold_chain_exposure_proxy_risk": 1.0,
+              "predicted_delay_min": 15.79386802701461,
+              "predicted_arrival_delay_min": 15.79386802701461,
+              "delay_risk": 0.4164,
+              "assessment": "BUFFER is ineligible; production continuity falls back to incoming shipment arrival.",
+              "reason": "ASSUMED stock is insufficient; BUFFER cannot cover the factory deadline. Incoming shipment delay and exposure are unchanged.",
+              "success_probability": 0.0
+            },
+            {
+              "action": "EXPEDITE",
+              "eligible": true,
+              "production_continuity_probability": 1.0,
+              "on_time_arrival_probability": 1.0,
+              "cold_chain_exposure_proxy_risk": 1.0,
+              "predicted_delay_min": 0.0,
+              "predicted_arrival_delay_min": 0.0,
+              "delay_risk": 0.0,
+              "assessment": "Incoming shipment arrival determines production continuity; exposure remains an ambient proxy.",
+              "reason": "ASSUMED transport and handling speed factors reduce all corresponding journey minutes.",
+              "success_probability": 0.0
+            },
+            {
+              "action": "REROUTE",
+              "eligible": false,
+              "production_continuity_probability": 0.0,
+              "on_time_arrival_probability": 0.0,
+              "cold_chain_exposure_proxy_risk": 1.0,
+              "predicted_delay_min": 0.0,
+              "predicted_arrival_delay_min": 0.0,
+              "delay_risk": 0.0,
+              "assessment": "The transport intervention is unavailable in the scenario; factory timing cannot be restored by this action.",
+              "reason": "REROUTE is unavailable under the simulated availability input; delay and ambient proxy calculations describe the hypothetical alternative.",
+              "success_probability": 0.0
+            }
+          ],
+          "navigation": {
+            "state": "WATCH",
+            "kind": "ASSUMED",
+            "normal_route_eligible": true,
+            "delay_penalty_min": 6.043687523139739,
+            "delay_kind": "ASSUMED",
+            "reported_delay_min": null,
+            "provider": null,
+            "observed_at": "2026-09-30T12:00:00Z",
+            "reason": "No valid official navigation adapter input is available. State uses ASSUMED delay bands of 30/60 min, with the largest level/discharge trend component; absolute Rhine values imply no official restriction.",
+            "warnings": []
+          },
+          "recommendation": {
+            "action": "EXPEDITE",
+            "confidence": "MEDIUM",
+            "reason": "EXPEDITE: production continuity 1.000, incoming on-time arrival 1.000, cold-chain exposure proxy risk 1.000, incoming mean lateness 0.0 min. It meets the production continuity target 0.950; eligible shipment interventions meeting that target are compared by lower exposure proxy, lower incoming lateness, then higher on-time arrival.",
+            "why_not": {
+              "BUFFER": "Ineligible: ASSUMED stock is insufficient; BUFFER cannot cover the factory deadline. Incoming shipment delay and exposure are unchanged.",
+              "REROUTE": "Ineligible: REROUTE is unavailable under the simulated availability input; delay and ambient proxy calculations describe the hypothetical alternative."
+            },
+            "would_change_if": [],
+            "policy_detail": "ASSUMED policy: production continuity target 0.950; BUFFER incoming on-time target 0.900 and cold-chain exposure proxy cap 0.100. Qualified shipment interventions compare lower exposure proxy, then lower incoming mean lateness, then higher on-time arrival; remaining ties use EXPEDITE before REROUTE. These are scenario criteria, not QA release rules."
+          },
+          "data_provenance": {
+            "shipment_state": {
+              "kind": "SIMULATED",
+              "provider": null,
+              "observed_at": "2026-09-30T12:00:00Z",
+              "source_indices": [],
+              "detail": "Shipment schedule, factory stock, route availability and packaging protection are scenario inputs."
+            },
+            "model_coefficients": {
+              "kind": "ASSUMED",
+              "provider": null,
+              "observed_at": null,
+              "source_indices": [],
+              "detail": "Delay coefficients, variability and the ambient exposure proxy budget are uncalibrated assumptions."
+            },
+            "delay_simulation": {
+              "kind": "MODEL",
+              "provider": null,
+              "observed_at": null,
+              "source_indices": [],
+              "detail": "Seeded Monte Carlo scenario frequencies (10000 runs; seed 20260930), conditional on simulated state and assumed coefficients."
+            },
+            "rhine_current": {
+              "kind": "REAL",
+              "provider": "Bundesamt f\u00fcr Umwelt BAFU via Open Data Basel-Stadt",
+              "observed_at": "2026-09-30T12:00:00Z",
+              "source_indices": [
+                0
+              ],
+              "detail": "Latest usable Basel Rhine level/discharge observation; no navigation forecast implied."
+            },
+            "traffic_current": {
+              "kind": "REAL",
+              "provider": "Amt f\u00fcr Mobilit\u00e4t, Open Data Basel-Stadt",
+              "observed_at": "2026-09-30T12:00:00Z",
+              "source_indices": [
+                1
+              ],
+              "detail": "Latest usable complete hourly station counts; individual timestamps remain in external_state."
+            },
+            "weather_current": {
+              "kind": "REAL",
+              "provider": "MeteoSwiss",
+              "observed_at": "2026-09-30T12:00:00Z",
+              "source_indices": [
+                2
+              ],
+              "detail": "MeteoSwiss Basel/Binningen ambient observations; no product temperature is measured."
+            },
+            "traffic_anomaly": {
+              "kind": "MODEL",
+              "provider": null,
+              "observed_at": null,
+              "source_indices": [
+                1
+              ],
+              "detail": "Historical statistical anomaly detection using station, weekday and local-hour sample history; current observation availability is labelled separately."
+            },
+            "rhine_trends": {
+              "kind": "MODEL",
+              "provider": null,
+              "observed_at": null,
+              "source_indices": [
+                0
+              ],
+              "detail": "Bounded linear slopes of preceding observation sample history; no validated navigation relationship."
+            },
+            "weather_trend": {
+              "kind": "MODEL",
+              "provider": null,
+              "observed_at": null,
+              "source_indices": [
+                2
+              ],
+              "detail": "Bounded linear ambient-temperature slope from preceding sample history; no future weather forecast implied."
+            },
+            "rhine_navigation": {
+              "kind": "ASSUMED",
+              "provider": null,
+              "observed_at": "2026-09-30T12:00:00Z",
+              "source_indices": [],
+              "detail": "No valid official navigation adapter input is available. State uses ASSUMED delay bands of 30/60 min, with the largest level/discharge trend component; absolute Rhine values imply no official restriction."
+            },
+            "rhine_navigation_delay": {
+              "kind": "ASSUMED",
+              "provider": null,
+              "observed_at": null,
+              "source_indices": [],
+              "detail": "Navigation mean-minute addition (6.04369 min) has its own provenance; an official state alone does not supply a validated delay relationship."
+            }
+          },
+          "main_risk_drivers": [
+            {
+              "name": "Traffic anomaly",
+              "value": -0.17948440074539437,
+              "unit": "z-score",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "Station 402 observed 1262 vehicles against baseline mean 1269.1538461538462; largest available z-score is capped at ASSUMED 4 and multiplied by ASSUMED 12 min/z. This adds mean transport time before random draws.",
+              "evidence_kind": "observed"
+            },
+            {
+              "name": "Rhine level trend",
+              "value": -0.7554609403924674,
+              "unit": "cm/hour",
+              "estimated_delay_contribution_min": 6.043687523139739,
+              "explanation": "Observed falling trend multiplied by ASSUMED 8 min per cm/hour. Level and discharge represent the same hydrological state, so only the largest component contributes, capped at ASSUMED 90 min. This is an ASSUMED navigation scenario, not a validated navigation relationship or official threshold.",
+              "evidence_kind": "observed"
+            },
+            {
+              "name": "Rhine discharge trend",
+              "value": -5.717126249537209,
+              "unit": "m\u00b3/s/hour",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "Observed falling trend multiplied by ASSUMED 1 min per m\u00b3/s/hour. Level and discharge represent the same hydrological state, so only the largest component contributes, capped at ASSUMED 90 min. This is an ASSUMED navigation scenario, not a validated navigation relationship or official threshold.",
+              "evidence_kind": "observed"
+            },
+            {
+              "name": "Observed rain",
+              "value": 0.0,
+              "unit": "mm/hour",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "Latest hourly precipitation multiplied by ASSUMED 4 min/mm for every route. This is an assumed mean transport addition, not a precipitation forecast.",
+              "evidence_kind": "observed"
+            },
+            {
+              "name": "Observed wind",
+              "value": 0.8,
+              "unit": "m/s",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "Observed wind above ASSUMED 10 m/s multiplied by ASSUMED 3 min per m/s for every route; an assumed mean transport addition.",
+              "evidence_kind": "observed"
+            },
+            {
+              "name": "Snapshot ambient temperature",
+              "value": 26.4,
+              "unit": "\u00b0C",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "Ambient is 18.4\u00b0C outside ASSUMED reference band (2.0, 8.0). Snapshot ambient is ASSUMED constant over the entire future unprotected interval; actual product temperature is not inferred.",
+              "evidence_kind": "observed"
+            },
+            {
+              "name": "Planned remaining transport",
+              "value": 360.0,
+              "unit": "min",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "SIMULATED remaining transport excludes handling; normal variation is added using ASSUMED transport_sd_min and transport duration is floored at zero.",
+              "evidence_kind": "assumed"
+            },
+            {
+              "name": "Remaining handling",
+              "value": 0.0,
+              "unit": "min",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "SIMULATED handling is separately varied using ASSUMED handling_sd_min and added to whole-journey time.",
+              "evidence_kind": "assumed"
+            },
+            {
+              "name": "Time until factory deadline",
+              "value": 360.0,
+              "unit": "min",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "SIMULATED schedule window; lateness is total remaining journey time beyond this window, floored at zero.",
+              "evidence_kind": "assumed"
+            },
+            {
+              "name": "Remaining packaging protection",
+              "value": 0.0,
+              "unit": "min",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "SIMULATED whole-journey packaging autonomy; ambient exposure proxy accrues only after this duration expires.",
+              "evidence_kind": "assumed"
+            },
+            {
+              "name": "Prior ambient exposure proxy",
+              "value": 0.0,
+              "unit": "\u00b0C\u00b7min",
+              "estimated_delay_contribution_min": 0.0,
+              "explanation": "SIMULATED prior degree-minutes added to each action's future exposure proxy; not measured product exposure.",
+              "evidence_kind": "assumed"
+            }
+          ],
+          "features": {
+            "as_of": "2026-09-30T12:00:00Z",
+            "traffic": [
+              {
+                "station_id": "402",
+                "interval_end": "2026-09-30T12:00:00Z",
+                "observed_count": 1262.0,
+                "baseline_mean": 1269.1538461538462,
+                "baseline_sd": 39.85775991749945,
+                "baseline_sample_count": 13,
+                "z_score": -0.17948440074539437,
+                "status": "ok"
+              }
+            ],
+            "rhine": {
+              "observed_at": "2026-09-30T12:00:00Z",
+              "level_masl": 244.815,
+              "discharge_m3_s": 365.218,
+              "level_trend_cm_per_hour": -0.7554609403924674,
+              "discharge_trend_m3_s_per_hour": -5.717126249537209,
+              "sample_count": 73
+            },
+            "weather": {
+              "observed_at": "2026-09-30T12:00:00Z",
+              "air_temperature_c": 26.4,
+              "precipitation_mm": 0.0,
+              "wind_speed_m_s": 0.8,
+              "relative_humidity_pct": 41.1,
+              "temperature_trend_c_per_hour": 1.8392857142857142
+            },
+            "warnings": [],
+            "official_navigation": null
+          },
+          "simulated_shipment": {
+            "simulated": true,
+            "shipment_id": "operations-action-demo-v1-shipment-002",
+            "as_of": "2026-09-30T12:00:00Z",
+            "deadline_at": "2026-09-30T18:00:00Z",
+            "route_mode": "river",
+            "planned_remaining_min": 360.0,
+            "handling_min": 0.0,
+            "protection_remaining_min": 0.0,
+            "prior_exposure_degree_min": 0.0,
+            "stock_available": 0,
+            "stock_required": 1,
+            "expedite_available": true,
+            "reroute_available": false
+          },
+          "assumptions": {
+            "assumed": true,
+            "n_runs": 10000,
+            "seed": 20260930,
+            "transport_sd_min": 25.0,
+            "handling_sd_min": 10.0,
+            "traffic_min_per_positive_z": 12.0,
+            "traffic_z_cap": 4.0,
+            "falling_level_min_per_cm_hour": 8.0,
+            "falling_discharge_min_per_m3_s_hour": 1.0,
+            "river_penalty_cap_min": 90.0,
+            "rain_min_per_mm": 4.0,
+            "wind_threshold_m_s": 10.0,
+            "wind_min_per_m_s": 3.0,
+            "delay_threshold_min": 15.0,
+            "ambient_reference_band_c": [
+              2.0,
+              8.0
+            ],
+            "exposure_budget_degree_min": 300.0,
+            "expedite_transport_factor": 0.75,
+            "expedite_handling_factor": 0.5,
+            "reroute_transport_min": 95.0,
+            "reroute_transport_sd_min": 20.0,
+            "reroute_extra_handling_min": 20.0,
+            "reroute_traffic_factor": 0.5,
+            "max_traffic_age_min": 90.0,
+            "max_rhine_age_min": 30.0,
+            "max_weather_age_min": 90.0,
+            "trend_window_min": 360.0,
+            "trend_min_span_min": 60.0,
+            "baseline_min_samples": 3,
+            "navigation_restricted_penalty_min": 30.0,
+            "navigation_severe_penalty_min": 60.0,
+            "route_block_delay_min": 1440.0,
+            "recommendation_policy": {
+              "target_production_continuity": 0.95,
+              "target_on_time_arrival": 0.9,
+              "max_exposure_proxy_risk": 0.1,
+              "sensitivity_factors": [
+                0.5,
+                1.5,
+                2.0
+              ]
+            }
+          },
+          "real_data_sources": [
+            {
+              "provider": "Bundesamt f\u00fcr Umwelt BAFU via Open Data Basel-Stadt",
+              "dataset": "100089",
+              "url": "https://data.bs.ch/api/explore/v2.1/catalog/datasets/100089/records?limit=100&where=timestamp%3E%3Ddate%272026-09-30T00%3A00%3A00Z%27%20and%20timestamp%3C%3Ddate%272026-09-30T12%3A00%3A00Z%27&order_by=timestamp%20asc",
+              "retrieved_at": "2026-10-03T10:39:34.638139Z",
+              "licence": "CC0 1.0",
+              "real_data": true,
+              "sha256": "78cefb7d1f8a3e796c6aa38f44459f1ee14c28958ec6f8155ef952f05efae22a"
+            },
+            {
+              "provider": "Amt f\u00fcr Mobilit\u00e4t, Open Data Basel-Stadt",
+              "dataset": "100006",
+              "url": "https://data.bs.ch/api/explore/v2.1/catalog/datasets/100006/records?limit=100&select=zst_id,sitename,datetimefrom,datetimeto,directionname,lanecode,total,valuesapproved,valuesedited,weekday,hourfrom&where=zst_id%3D402%20and%20weekday%3D2%20and%20hourfrom%3D13%20and%20datetimefrom%3E%3Ddate%272026-07-01T00%3A00%3A00Z%27%20and%20datetimefrom%3C%3Ddate%272026-09-30T11%3A00%3A00Z%27&order_by=datetimefrom%20asc,lanecode%20asc",
+              "retrieved_at": "2026-10-03T10:39:34.579139Z",
+              "licence": "CC BY 4.0",
+              "real_data": true,
+              "sha256": "7a742c8823cc644666d49d8dcde499a5bc4a34665116784596d77d0fa97efd71"
+            },
+            {
+              "provider": "MeteoSwiss",
+              "dataset": "SwissMetNet BAS hourly observations",
+              "url": "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn/bas/ogd-smn_bas_h_recent.csv",
+              "retrieved_at": "2026-10-03T10:38:04.027057Z",
+              "licence": "CC BY 4.0; Source: MeteoSwiss",
+              "real_data": true,
+              "sha256": "06f651012668482a44055acee54628f30a00957e5758cfe8af28a231b20f2a26"
+            }
+          ],
+          "limitations": [
+            "All shipment, factory stock, protection, coefficients and thresholds are SIMULATED or ASSUMED; none are external provider facts or validated QA limits.",
+            "Monte Carlo probabilities are scenario frequencies under uncalibrated assumptions, not calibrated forecasts or validated operational success rates.",
+            "The cold-chain exposure measure is an ambient degree-minute proxy; ambient observations alone do not establish actual product-temperature excursions.",
+            "Ambient weather observations alone do not establish actual product-temperature excursion, pharmaceutical quality, or QA release status.",
+            "ASSUMED snapshot ambient remains constant over the whole future unprotected journey; this conservative persistence scenario is not a weather forecast and can miss future worsening.",
+            "ASSUMED packaging autonomy expires as one whole-journey clock; refrigeration failures, packaging performance and product thermal response are not modelled.",
+            "Independent normal transport and handling draws, with durations floored at zero, are paired across actions; they do not model extremes, station causality or operational feasibility.",
+            "Without a valid official status/forecast adapter, Rhine navigation state and delay use an ASSUMED fallback. Falling level/discharge describe one hydrological state; the largest component is used without summing them. No official threshold values are inferred.",
+            "Deprecated success_probability is stock sufficiency for BUFFER; for EXPEDITE/REROUTE it is the joint frequency of lateness <= delay_threshold_min and ambient proxy <= exposure_budget_degree_min. It does not drive recommendations.",
+            "Comparable production continuity and on-time arrival use the exact simulated deadline, independently of delay_threshold_min and the ambient proxy budget."
+          ],
+          "model": "Explainable paired normal Monte Carlo with ambient degree-minute exposure proxy v2"
+        },
+        "reason": "Paired Monte Carlo uses stored external evidence and planned duration minus elapsed time since actual departure. Timing is conditional on assumptions, not QA release."
+      }
+    ],
+    "product_temperature": [
+      {
+        "shipment_id": "operations-action-demo-v1-shipment-002",
+        "status": "OBSERVED_BUDGET_EXCEEDED",
+        "reading_count": 25,
+        "range_c": [
+          2.0,
+          8.0
+        ],
+        "budget_min": 120.0,
+        "first_reading_at": "2026-09-30T00:00:00Z",
+        "last_reading_at": "2026-09-30T12:00:00Z",
+        "last_product_c": 18.774098,
+        "last_product_outside_range": true,
+        "observed_excursion_min": 147.69844272579311,
+        "reported_excursion_min": 147.784928,
+        "unobserved_interval_min": 0.0,
+        "complete_journey": false,
+        "qa_release_authorized": false,
+        "limitations": [
+          "Product-temperature excursion uses piecewise-linear interpolation only between samples at most 60 minutes apart; this sampling assumption does not infer a physical thermal response.",
+          "No product temperature is extrapolated before the first or after the last reading. Unsampled intervals may contain additional excursion.",
+          "Reported cumulative excursion is source evidence retained separately; it is not treated as a directly measured duration or used for this status.",
+          "Material range and excursion budget are demonstration assumptions, not validated pharmaceutical QA release criteria. Human QA review is required for release; this assessment never authorizes it.",
+          "The journey is not completely sampled. Computed excursion covers only usable intervals, a partial lower bound under the interpolation assumption; within-budget status does not establish whole-journey compliance."
+        ]
+      }
+    ],
+    "recommendation": {
+      "action": "EXPEDITE",
+      "reason": "EXPEDITE: production continuity 1.000, incoming on-time arrival 1.000, cold-chain exposure proxy risk 1.000, incoming mean lateness 0.0 min. It meets the production continuity target 0.950; eligible shipment interventions meeting that target are compared by lower exposure proxy, lower incoming lateness, then higher on-time arrival. Production timing is conditional on material quantity and subsequent human QA release; it is not a production authorization. Human QA review is required; no automatic quarantine or release is inferred.",
+      "requires_approval_by": "logistics",
+      "qa_review_required": true,
+      "alternatives": [
+        {
+          "action": "BUFFER",
+          "eligible": false,
+          "production_continuity_probability": 0.3566,
+          "on_time_arrival_probability": 0.3566,
+          "cold_chain_exposure_proxy_risk": 1.0,
+          "predicted_delay_min": 15.79386802701461,
+          "predicted_arrival_delay_min": 15.79386802701461,
+          "delay_risk": 0.4164,
+          "assessment": "BUFFER is ineligible; production continuity falls back to incoming shipment arrival.",
+          "reason": "ASSUMED stock is insufficient; BUFFER cannot cover the factory deadline. Incoming shipment delay and exposure are unchanged.",
+          "success_probability": 0.0
+        },
+        {
+          "action": "EXPEDITE",
+          "eligible": true,
+          "production_continuity_probability": 1.0,
+          "on_time_arrival_probability": 1.0,
+          "cold_chain_exposure_proxy_risk": 1.0,
+          "predicted_delay_min": 0.0,
+          "predicted_arrival_delay_min": 0.0,
+          "delay_risk": 0.0,
+          "assessment": "Incoming shipment arrival determines production continuity; exposure remains an ambient proxy.",
+          "reason": "ASSUMED transport and handling speed factors reduce all corresponding journey minutes.",
+          "success_probability": 0.0
+        },
+        {
+          "action": "REROUTE",
+          "eligible": false,
+          "production_continuity_probability": 0.0,
+          "on_time_arrival_probability": 0.0,
+          "cold_chain_exposure_proxy_risk": 1.0,
+          "predicted_delay_min": 0.0,
+          "predicted_arrival_delay_min": 0.0,
+          "delay_risk": 0.0,
+          "assessment": "The transport intervention is unavailable in the scenario; factory timing cannot be restored by this action.",
+          "reason": "REROUTE is unavailable under the simulated availability input; delay and ambient proxy calculations describe the hypothetical alternative.",
+          "success_probability": 0.0
+        }
+      ],
+      "qa_release_authorized": false
+    },
+    "provenance": [
+      {
+        "kind": "SIMULATED",
+        "provider": null,
+        "observed_at": "2026-09-30T12:00:00Z",
+        "source_indices": [],
+        "detail": "Persisted operational snapshot and shipment product readings; no generator labels used."
+      },
+      {
+        "kind": "REAL",
+        "provider": null,
+        "observed_at": null,
+        "source_indices": [
+          0,
+          1,
+          2
+        ],
+        "detail": "Stored external observations and retrieval metadata; no analysis-worker provider fetch."
+      },
+      {
+        "kind": "ASSUMED",
+        "provider": null,
+        "observed_at": null,
+        "source_indices": [],
+        "detail": "Immutable persisted configuration batch-default-v1; uncalibrated coefficients and sparse product-temperature interpolation."
+      }
+    ],
+    "real_data_sources": [
+      {
+        "provider": "Bundesamt f\u00fcr Umwelt BAFU via Open Data Basel-Stadt",
+        "dataset": "100089",
+        "url": "https://data.bs.ch/api/explore/v2.1/catalog/datasets/100089/records?limit=100&where=timestamp%3E%3Ddate%272026-09-30T00%3A00%3A00Z%27%20and%20timestamp%3C%3Ddate%272026-09-30T12%3A00%3A00Z%27&order_by=timestamp%20asc",
+        "retrieved_at": "2026-10-03T10:39:34.638139Z",
+        "licence": "CC0 1.0",
+        "real_data": true,
+        "sha256": "78cefb7d1f8a3e796c6aa38f44459f1ee14c28958ec6f8155ef952f05efae22a"
+      },
+      {
+        "provider": "Amt f\u00fcr Mobilit\u00e4t, Open Data Basel-Stadt",
+        "dataset": "100006",
+        "url": "https://data.bs.ch/api/explore/v2.1/catalog/datasets/100006/records?limit=100&select=zst_id,sitename,datetimefrom,datetimeto,directionname,lanecode,total,valuesapproved,valuesedited,weekday,hourfrom&where=zst_id%3D402%20and%20weekday%3D2%20and%20hourfrom%3D13%20and%20datetimefrom%3E%3Ddate%272026-07-01T00%3A00%3A00Z%27%20and%20datetimefrom%3C%3Ddate%272026-09-30T11%3A00%3A00Z%27&order_by=datetimefrom%20asc,lanecode%20asc",
+        "retrieved_at": "2026-10-03T10:39:34.579139Z",
+        "licence": "CC BY 4.0",
+        "real_data": true,
+        "sha256": "7a742c8823cc644666d49d8dcde499a5bc4a34665116784596d77d0fa97efd71"
+      },
+      {
+        "provider": "MeteoSwiss",
+        "dataset": "SwissMetNet BAS hourly observations",
+        "url": "https://data.geo.admin.ch/ch.meteoschweiz.ogd-smn/bas/ogd-smn_bas_h_recent.csv",
+        "retrieved_at": "2026-10-03T10:38:04.027057Z",
+        "licence": "CC BY 4.0; Source: MeteoSwiss",
+        "real_data": true,
+        "sha256": "06f651012668482a44055acee54628f30a00957e5758cfe8af28a231b20f2a26"
+      }
+    ],
+    "assumptions": {
+      "profile_id": "batch-default-v1",
+      "logistics": {
+        "assumed": true,
+        "n_runs": 10000,
+        "seed": 20260930,
+        "transport_sd_min": 25.0,
+        "handling_sd_min": 10.0,
+        "traffic_min_per_positive_z": 12.0,
+        "traffic_z_cap": 4.0,
+        "falling_level_min_per_cm_hour": 8.0,
+        "falling_discharge_min_per_m3_s_hour": 1.0,
+        "river_penalty_cap_min": 90.0,
+        "rain_min_per_mm": 4.0,
+        "wind_threshold_m_s": 10.0,
+        "wind_min_per_m_s": 3.0,
+        "delay_threshold_min": 15.0,
+        "ambient_reference_band_c": [
+          2.0,
+          8.0
+        ],
+        "exposure_budget_degree_min": 300.0,
+        "expedite_transport_factor": 0.75,
+        "expedite_handling_factor": 0.5,
+        "reroute_transport_min": 95.0,
+        "reroute_transport_sd_min": 20.0,
+        "reroute_extra_handling_min": 20.0,
+        "reroute_traffic_factor": 0.5,
+        "max_traffic_age_min": 90.0,
+        "max_rhine_age_min": 30.0,
+        "max_weather_age_min": 90.0,
+        "trend_window_min": 360.0,
+        "trend_min_span_min": 60.0,
+        "baseline_min_samples": 3,
+        "navigation_restricted_penalty_min": 30.0,
+        "navigation_severe_penalty_min": 60.0,
+        "route_block_delay_min": 1440.0,
+        "recommendation_policy": {
+          "target_production_continuity": 0.95,
+          "target_on_time_arrival": 0.9,
+          "max_exposure_proxy_risk": 0.1,
+          "sensitivity_factors": [
+            0.5,
+            1.5,
+            2.0
+          ]
+        }
+      },
+      "station_ids": [
+        "402"
+      ],
+      "origin": "Rotterdam",
+      "destination": "Basel production site",
+      "handling_min": 0.0,
+      "protection_remaining_min": 0.0,
+      "expedite_available": true,
+      "reroute_available": false,
+      "max_reading_gap_min": 60.0
+    },
+    "limitations": [
+      "Operations and product readings are synthetic demo evidence; material limits are demonstration assumptions, not pharmaceutical release policy.",
+      "QA and reservation state exists only at the operational snapshot reference time. Earlier historical states and the actual production decision at a past charge time cannot be reconstructed.",
+      "Released reservations are credited only when available by both cutoff and charge time. Unreserved stock and competing reservations are not automatically allocated.",
+      "Incoming dependency is prospective quantity coverage; arrivals and acceptable sampled temperatures do not imply QA release or production authorization.",
+      "Default observation selection uses latest stored revisions at the measurement cutoff, not knowledge available then. An explicit known_at filters stored retrieval history; operational capture history is unavailable.",
+      "Forward timing applies only to departed shipments in the configured corridor while planned remaining duration is positive; departure waits and overdue journeys require further evidence.",
+      "Timing/ambient Monte Carlo uses uncalibrated persisted assumptions. Protection autonomy is configured, not inferred from temperature samples; measured product exposure stays separate.",
+      "Action production-continuity probabilities are conditional timing events for one shipment, not batch QA/readiness probabilities. Multiple dependent shipments have no aggregate recommendation.",
+      "Seven existing domain/licence verification gates remain open.",
+      "All shipment, factory stock, protection, coefficients and thresholds are SIMULATED or ASSUMED; none are external provider facts or validated QA limits.",
+      "Monte Carlo probabilities are scenario frequencies under uncalibrated assumptions, not calibrated forecasts or validated operational success rates.",
+      "The cold-chain exposure measure is an ambient degree-minute proxy; ambient observations alone do not establish actual product-temperature excursions.",
+      "Ambient weather observations alone do not establish actual product-temperature excursion, pharmaceutical quality, or QA release status.",
+      "ASSUMED snapshot ambient remains constant over the whole future unprotected journey; this conservative persistence scenario is not a weather forecast and can miss future worsening.",
+      "ASSUMED packaging autonomy expires as one whole-journey clock; refrigeration failures, packaging performance and product thermal response are not modelled.",
+      "Independent normal transport and handling draws, with durations floored at zero, are paired across actions; they do not model extremes, station causality or operational feasibility.",
+      "Without a valid official status/forecast adapter, Rhine navigation state and delay use an ASSUMED fallback. Falling level/discharge describe one hydrological state; the largest component is used without summing them. No official threshold values are inferred.",
+      "Deprecated success_probability is stock sufficiency for BUFFER; for EXPEDITE/REROUTE it is the joint frequency of lateness <= delay_threshold_min and ambient proxy <= exposure_budget_degree_min. It does not drive recommendations.",
+      "Comparable production continuity and on-time arrival use the exact simulated deadline, independently of delay_threshold_min and the ambient proxy budget."
+    ]
+  }
+]

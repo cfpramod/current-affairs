@@ -32,3 +32,13 @@ Format: `- <date> · <decision> · @<github-username> · Affects: <tasks or area
 - 2026-10-03: Name the product Smartflow; apply the new flow mark in Laravel and the demo shell. Repository URLs, package names and data IDs retain their existing technical identifiers. Provide separate Laravel and ML implementation briefs from the tested integration branch.
 
 - 2026-10-03: Publish generated batch ML fixtures on data/simulated-shipment-training and generator/config/tests plus builder briefs on feat/build-integration. Keep the 18-batch demo unchanged; separate observable snapshots/features from hidden synthetic outcomes and split chronologically by independent shared-resource group.
+
+- 2026-10-03 · Add StoredBatchAssessment and immutable BatchAnalysisProfile contracts for SQLite-only joins, conserved stock quantities, separate Monte Carlo timing and sampled product-temperature evidence · @matla91 · Affects: engine, generated schemas/types and HTTP consumers · Why: preserve named scenarios and human QA/approval with reproducible evidence · Instead of: label predictions, analysis-worker provider fetches, automatic QA disposition or combining Laravel and engine databases.
+
+- 2026-10-03 · Bump batch calculations to batch-stored-evidence-v2: reached charge deadlines return retrospective null action with snapshot-history limits; temperature duration is unavailable without a usable sampled interval · @matla91 · Affects: batch worker, evidence explanations and HTTP consumers · Why: preserve factual inputs without inventing historical reservation/QA state, forward interventions or zero-duration compliance; append new records without rewriting v1 history.
+
+- 2026-10-03: Import the batch-linked assessment files from @matla91, repository matla91/bioflow-logistics at e80c57af142038d5ce8f5034751f4f024dbcf69a, into feat/batch-assessment-integration based on feat/build-integration. Preserve source provenance without importing external Git history; keep Laravel integration and any merge as separate reviewed work.
+
+- 2026-10-03: Apply the reviewed batch layer locally to feat/build-integration as requested; preserve the four null-action acceptance records and add a separate September 30 historical action replay using generated future-deadline operations and unchanged real cached observations. The existing worker selects BUFFER and EXPEDITE; QA remains human and no live forecast or model validation is claimed. Keep changes local pending publication instructions.
+
+- 2026-10-03: Publish the imported batch layer and separate action demo on origin/feat/build-integration so teammates can build against the shared contracts and stored-result API. Publication is authorized; PR merging remains a separate decision.

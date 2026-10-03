@@ -1,0 +1,9 @@
+# ASSUMED overrides for operations_demo.yaml; separate historical replay dataset.
+# Real provider cache remains at its original measurement timestamps.
+dataset_id: operations-action-demo-v1
+reference_at: "2026-09-30T12:00:00+00:00"
+shipments: 4
+batches: 2
+released_stock_kg: 50
+batch_first_offset_hours: 3
+batch_spacing_hours: 3
