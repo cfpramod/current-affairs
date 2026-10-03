@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Smartflow · QA approver wireframes</title>
+    <link rel="stylesheet" href="approver-theme.css" />
+    <script defer src="approver-interactions.js"></script>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="meta">SMARTFLOW / DESIGN EXPLORATION / QA APPROVER</div>
+      <h1>What evidence supports the quality decision?</h1>
+      <p>
+        Three sketch layouts in the operator console’s visual language. A
+        quarantine request starts a human QA review; arrival predictions and
+        stock coverage stay separate from lot quality.
+      </p>
+      <nav>
+        <a href="#qa-a">A · Decision first</a
+        ><a href="#qa-b">B · Evidence workbench</a
+        ><a href="#qa-c">C · Review queue</a
+        ><a href="logistics-approver-wireframes.html">Logistics views →</a>
+      </nav>
+      <p class="note">
+        DESIGN PROTOTYPE · Synthetic example values and illustrative trace.
+        Buttons demonstrate review interactions only. No live data, QA release
+        or workflow persistence.
+      </p>
+    </header>
+    <main>
+      <section class="turn" id="qa-a">
+        <div class="variant-label">
+          <a href="#qa-a">1a</a>Decision first: the hold request, evidence
+          confidence and production impact in one glance
+        </div>
+        <article class="card stack">
+          <div class="row between">
+            <span>QA review · QAR-DEMO-02 · Lot DEMO-HEAT-02</span>
+            <div class="tags">
+              <span class="tag">SIMULATED LOT</span
+              ><span class="tag">PENDING QA</span>
+            </div>
+          </div>
+          <h2>Review quarantine for the incoming lot</h2>
+          <div class="meta">
+            Requested by operator · Heat exposure during handover · 03 Oct,
+            12:00 UTC
+          </div>
+          <div class="grid">
+            <div class="box danger">
+              <div>Is there evidence of an excursion?</div>
+              <strong class="big bad">147.7 min / 120 min</strong>
+              <div>
+                Sampled excursion exceeds the assumed allowance by 27.7 min.
+              </div>
+              <div class="note">
+                PRODUCT SAMPLES · Synthetic fixture · 2–8 °C assumed band
+              </div>
+            </div>
+            <div class="box warning">
+              <div>Is the evidence sufficient for release?</div>
+              <strong class="big">Not established</strong>
+              <div>
+                Incomplete journey coverage; stability review and supporting
+                documents are missing.
+              </div>
+              <div class="note">
+                Within-budget samples would not establish release eligibility
+                either.
+              </div>
+            </div>
+          </div>
+          <div class="box recommendation stack">
+            <div class="eyebrow">REQUESTED DECISION · QA owns disposition</div>
+            <h3>Confirm quarantine while the deviation is investigated</h3>
+            <div>
+              Confirm the hold request, return it for more evidence, or
+              escalate. Release is a separate QA disposition with its own
+              supporting evidence.
+            </div>
+            <div class="buttons">
+              <button
+                class="primary"
+                data-decision="Confirm quarantine"
+                data-context="Lot DEMO-HEAT-02 · QA request QAR-DEMO-02 · assessment snapshot DEMO-ASMT-02"
+              >
+                Confirm quarantine…</button
+              ><button
+                class="secondary"
+                data-decision="Request more evidence"
+                data-context="Ask for the logger export, calibration and stability evidence; retain the hold pending review."
+              >
+                Request evidence…
+              </button>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="box">
+              <h3>What QA needs to inspect</h3>
+              <div>
+                Product logger trace · readings and gaps · last reading ·
+                excursion episodes · material band and allowance · logger
+                calibration · stability evidence · custody and transport
+                records.
+              </div>
+            </div>
+            <div class="box">
+              <h3>Production impact, separately</h3>
+              <div>
+                Batch DEMO-BATCH-02 needs 50 kg at 16:00 UTC. Released reserved
+                stock: 30 kg. Remaining dependency: 20 kg. Quarantined or
+                pending-QA stock cannot fill the gap.
+              </div>
+            </div>
+          </div>
+          <details>
+            <summary>Evidence identity and source status</summary>
+            <p>
+              Assessment snapshot DEMO-ASMT-02 · calculation version
+              batch-stored-evidence-v2. Product samples are simulated; material
+              limits are assumed. Ambient weather and transport predictions are
+              context, not product-quality measurements. Capture evidence
+              reference/hash in the implemented review record.
+            </p>
+          </details>
+          <div class="log note" data-log tabindex="-1" aria-live="polite">
+            Decision history · No QA disposition yet. A submitted review will
+            retain the evidence snapshot and rationale.
+          </div>
+        </article>
+      </section>
+      <section class="turn" id="qa-b">
+        <div class="variant-label">
+          <a href="#qa-b">1b</a>Evidence workbench: measured product history
+          beside a fixed QA decision panel
+        </div>
+        <article class="card stack">
+          <div class="row between">
+            <h2>Lot DEMO-HEAT-02 · deviation review</h2>
+            <span class="tag">ILLUSTRATIVE EVIDENCE</span>
+          </div>
+          <div class="workbench">
+            <div class="stack">
+              <div>
+                <h3>Product temperature · sample coverage visible</h3>
+                <div class="meta">
+                  Solid = observed sample intervals · blank gap = no
+                  interpolation · 2–8 °C assumed band
+                </div>
+              </div>
+              <svg
+                class="trace"
+                viewBox="0 0 640 230"
+                role="img"
+                aria-label="Illustrative temperature rises above the eight degree upper band; a missing reading interval is shown as a gap."
+              >
+                <rect class="band" x="45" y="90" width="565" height="85" />
+                <rect class="heat" x="380" y="25" width="145" height="175" />
+                <line class="limit" x1="45" y1="90" x2="610" y2="90" />
+                <line class="limit" x1="45" y1="175" x2="610" y2="175" />
+                <text x="8" y="95">8 °C</text>
+                <text x="8" y="180">2 °C</text>
+                <path class="line" d="M45 135 L110 130 L180 132 L240 120" />
+                <path class="line" d="M320 116 L365 95" />
+                <path
+                  class="exceed"
+                  d="M365 95 L405 66 L460 43 L520 40 L580 48"
+                />
+                <text x="240" y="195">reading gap</text>
+                <text x="400" y="218">handover exposure</text>
+                <text x="45" y="218">departure</text>
+                <text x="555" y="20">cutoff</text>
+              </svg>
+              <div class="grid">
+                <div class="box">
+                  <h3>Excursion accounting</h3>
+                  Sampled duration: 147.7 min<br />Logger reported: 147.8 min<br />Difference:
+                  interpolation method<br /><span class="note"
+                    >Do not substitute ambient exposure proxy.</span
+                  >
+                </div>
+                <div class="box warning">
+                  <h3>Uncertainty</h3>
+                  Full journey: incomplete<br />Unusable gaps: shown
+                  explicitly<br />Calibration: not provided<br />Stability
+                  assessment: pending
+                </div>
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Evidence</th>
+                      <th>Status / what to check</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Logger export &amp; last reading</td>
+                      <td>
+                        Samples available; confirm sensor identity and original
+                        export
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Material specification</td>
+                      <td>
+                        2–8 °C / 120 min are demo assumptions; verified limit
+                        needed
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Custody / packaging</td>
+                      <td>
+                        Handover event recorded; packaging qualification not
+                        supplied
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>QA disposition &amp; deviation</td>
+                      <td>Pending; reason and evidence reference required</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <details>
+                <summary>
+                  Raw samples, event history and source references ▾
+                </summary>
+                <p>
+                  The implemented view should expose sample timestamps,
+                  readings, interpolation gaps, transport handovers and
+                  immutable assessment identity. No reconstructed measurements
+                  should fill gaps.
+                </p>
+              </details>
+            </div>
+            <aside class="box recommendation stack">
+              <div class="eyebrow">QA DECISION</div>
+              <h3>Quarantine requested</h3>
+              <p>
+                Review the observed excursion and uncertainty before deciding
+                the lot’s disposition.
+              </p>
+              <div class="checklist">
+                <label
+                  ><input type="checkbox" /> Reviewed original logger
+                  evidence</label
+                ><label
+                  ><input type="checkbox" /> Checked material
+                  specification</label
+                ><label
+                  ><input type="checkbox" /> Identified missing evidence</label
+                >
+              </div>
+              <button
+                class="primary"
+                data-decision="Confirm quarantine"
+                data-context="QA workbench · DEMO-HEAT-02 · save rationale against the reviewed snapshot in implementation."
+              >
+                Confirm quarantine…</button
+              ><button
+                class="secondary"
+                data-decision="Escalate deviation review"
+                data-context="Identify missing documents, specialist review or a required stability assessment."
+              >
+                Escalate / request evidence…
+              </button>
+              <div class="note">
+                Release is a separate workflow; it is not authorized by this
+                screen’s model output.
+              </div>
+            </aside>
+          </div>
+          <div class="log note" data-log tabindex="-1" aria-live="polite">
+            Audit trail · Requested → evidence reviewed → QA disposition →
+            operator notified. Prototype only.
+          </div>
+        </article>
+      </section>
+      <section class="turn" id="qa-c">
+        <div class="variant-label">
+          <a href="#qa-c">1c</a>Review queue: prioritize lot decisions, then
+          open the complete evidence packet
+        </div>
+        <article class="card stack">
+          <div class="row between">
+            <h2>QA review inbox</h2>
+            <span class="tag">3 ILLUSTRATIVE REQUESTS</span>
+          </div>
+          <div class="tags">
+            <span class="tag">Quarantine requested · 1</span
+            ><span class="tag">Awaiting evidence · 1</span
+            ><span class="tag">Needs initial review · 1</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Lot / request</th>
+                  <th>Why review?</th>
+                  <th>Evidence</th>
+                  <th>Production consequence</th>
+                  <th>Next step</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="selected">
+                  <td>DEMO-HEAT-02<br />Quarantine requested</td>
+                  <td>Sampled excursion above assumed budget</td>
+                  <td>147.7 / 120 min<br />Coverage incomplete</td>
+                  <td>20 kg batch dependency<br />Charge 16:00 UTC</td>
+                  <td><a href="#qa-b">Open review →</a></td>
+                </tr>
+                <tr>
+                  <td>DEMO-GAP-03<br />Awaiting evidence</td>
+                  <td>Logger gap prevents duration estimate</td>
+                  <td>Unknown / null<br />Original export requested</td>
+                  <td>No released reservation</td>
+                  <td><a href="#qa-b">Inspect missing evidence →</a></td>
+                </tr>
+                <tr>
+                  <td>DEMO-ARRIVED-01<br />Initial review</td>
+                  <td>Arrived lot still pending QA</td>
+                  <td>
+                    Samples within allowance<br />Last sample needs review
+                  </td>
+                  <td>Released stock covers batch</td>
+                  <td><a href="#qa-a">Open evidence packet →</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="box warning">
+            Unknown duration stays “unknown.” Arrival, stock coverage and a
+            modeled low exposure risk do not replace QA evidence.
+          </div>
+          <div class="note">
+            Queue rows are illustrative. Selecting a row opens the same
+            lot-centric evidence workbench; no bulk release or one-click
+            approval from the inbox.
+          </div>
+        </article>
+      </section>
+    </main>
+    <dialog aria-labelledby="review-title">
+      <form>
+        <h2 id="review-title">Review decision</h2>
+        <p data-context></p>
+        <p class="note">
+          Prototype confirmation only. The implemented audit record should
+          include the QA request, lot, exact assessment, reviewer and time.
+        </p>
+        <label for="reason">Decision reason / evidence requested</label
+        ><textarea
+          id="reason"
+          name="reason"
+          required
+          placeholder="What evidence supports this decision?"
+        ></textarea>
+        <p>
+          <label
+            ><input type="checkbox" name="reviewed" required /> I reviewed the
+            evidence and its limitations.</label
+          >
+        </p>
+        <p data-error class="error" aria-live="polite"></p>
+        <div class="buttons">
+          <button class="primary" type="submit">Preview decision</button
+          ><button class="secondary" type="button" data-cancel>Cancel</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

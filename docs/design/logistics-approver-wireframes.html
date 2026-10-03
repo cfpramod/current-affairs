@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Smartflow · Logistics approver wireframes</title>
+    <link rel="stylesheet" href="approver-theme.css" />
+    <script defer src="approver-interactions.js"></script>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="meta">
+        SMARTFLOW / DESIGN EXPLORATION / LOGISTICS APPROVER
+      </div>
+      <h1>Which transport intervention can we authorize?</h1>
+      <p>
+        Three sketch layouts matching the operator console. Compare expedite and
+        reroute against the original journey, then review feasibility and
+        authorize a specific transport plan.
+      </p>
+      <nav>
+        <a href="#log-a">A · Decision first</a
+        ><a href="#log-b">B · Options workbench</a
+        ><a href="#log-c">C · Review queue</a
+        ><a href="qa-approver-wireframes.html">QA views →</a>
+      </nav>
+      <p class="note">
+        DESIGN PROTOTYPE · Historical action replay plus illustrative
+        operational fields. Decisions are previews only. No carrier booking,
+        live tracking or production authorization.
+      </p>
+    </header>
+    <main>
+      <section class="turn" id="log-a">
+        <div class="variant-label">
+          <a href="#log-a">2a</a>Decision first: timing benefit next to the
+          operational prerequisites
+        </div>
+        <article class="card stack">
+          <div class="row between">
+            <span>Logistics review · LGR-DEMO-02 · Rotterdam → Basel</span>
+            <div class="tags">
+              <span class="tag">SIMULATED SHIPMENT</span
+              ><span class="tag">DEPARTED</span>
+            </div>
+          </div>
+          <h2>Expedite the remaining journey</h2>
+          <div class="meta">
+            Batch operations-action-demo-v1-batch-002 · 50 kg required · charge
+            18:00 UTC · replay cutoff 30 Sep, 12:00 UTC
+          </div>
+          <div class="grid">
+            <div class="box">
+              <div>Will the incoming lot arrive by charge?</div>
+              <strong class="big">35.66% → 100%</strong>
+              <div>
+                Baseline → expedite, conditional on the assumed speed factors.
+              </div>
+              <div class="note">
+                MODEL · 10,000 seeded runs · 100% is the sample result, not a
+                guarantee
+              </div>
+            </div>
+            <div class="box warning">
+              <div>Is the transport plan ready to execute?</div>
+              <strong class="big">Confirmation needed</strong>
+              <div>
+                Carrier slot, remaining-leg feasibility and incremental cost
+                have not been supplied.
+              </div>
+              <div class="note">
+                Model eligibility does not establish a confirmed carrier
+                booking.
+              </div>
+            </div>
+          </div>
+          <div class="box recommendation stack">
+            <div class="eyebrow">RECOMMENDATION · LOGISTICS DECIDES</div>
+            <h3>Review the expedite request with the carrier</h3>
+            <div>
+              No reserved stock covers this batch. The model improves timing;
+              product disposition remains with QA. Approve only the specific
+              executable plan after confirming its prerequisites.
+            </div>
+            <div class="buttons">
+              <button
+                class="primary"
+                data-decision="Review expedite approval"
+                data-context="LGR-DEMO-02 · shipment operations-action-demo-v1-shipment-002 · exact assessment selected in implementation. Carrier, route and cost confirmations are required before actual dispatch authorization."
+              >
+                Review approval…</button
+              ><button
+                class="secondary"
+                data-decision="Return expedite request for details"
+                data-context="Ask the operator or carrier for a feasible expedite leg, slot, quoted cost and handling plan."
+              >
+                Request plan details…
+              </button>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="box">
+              <h3>Operational checks</h3>
+              <div>
+                Current leg / position · confirmed expedite service · carrier
+                contact reference · pickup and dock windows · transfer handling
+                · cold-chain equipment · cost and budget owner.
+              </div>
+            </div>
+            <div class="box danger">
+              <h3>Quality is still unresolved</h3>
+              <div>
+                Ambient exposure proxy: 100% for baseline and expedite. This is
+                not a measured product excursion probability. QA review is
+                required; transport approval cannot release the lot.
+              </div>
+            </div>
+          </div>
+          <details>
+            <summary>
+              Evidence, assumptions and unavailable alternatives ▾
+            </summary>
+            <p>
+              Fresh weather is stored at the September 30 replay cutoff;
+              operations are synthetic. Timing uses an uncalibrated model with
+              assumed expedite factors. REROUTE is unavailable in this profile:
+              there is no supporting transfer evidence. Open the exact stored
+              assessment and immutable inputs in the implemented screen.
+            </p>
+          </details>
+          <div class="log note" data-log tabindex="-1" aria-live="polite">
+            Transport history · Requested → carrier feasibility confirmed →
+            logistics authorization → dispatch confirmation → updated
+            assessment.
+          </div>
+        </article>
+      </section>
+      <section class="turn" id="log-b">
+        <div class="variant-label">
+          <a href="#log-b">2b</a>Options workbench: compare transport plans and
+          inspect the selected intervention
+        </div>
+        <article class="card stack">
+          <div class="row between">
+            <h2>Expedite or reroute?</h2>
+            <span class="tag">TIMING + FEASIBILITY + HANDLING</span>
+          </div>
+          <div class="workbench">
+            <div class="stack">
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Decision evidence</th>
+                      <th>Baseline</th>
+                      <th>Expedite ★</th>
+                      <th>Reroute</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Arrival by 18:00 charge</td>
+                      <td>35.66%</td>
+                      <td class="selected">100% modeled</td>
+                      <td>Not supported</td>
+                    </tr>
+                    <tr>
+                      <td>Mean modeled lateness</td>
+                      <td>15.79 min</td>
+                      <td class="selected">0 min</td>
+                      <td>Not available</td>
+                    </tr>
+                    <tr>
+                      <td>Released reserved stock</td>
+                      <td>0 kg</td>
+                      <td class="selected">Unchanged</td>
+                      <td>Unchanged</td>
+                    </tr>
+                    <tr>
+                      <td>Ambient exposure proxy</td>
+                      <td>100%</td>
+                      <td class="selected">100% · QA separate</td>
+                      <td>Not assessed</td>
+                    </tr>
+                    <tr>
+                      <td>Carrier / slot confirmation</td>
+                      <td>Existing route</td>
+                      <td class="selected">Pending</td>
+                      <td>Transfer not evidenced</td>
+                    </tr>
+                    <tr>
+                      <td>Incremental cost</td>
+                      <td>Reference only</td>
+                      <td class="selected">Quote required</td>
+                      <td>Quote required</td>
+                    </tr>
+                    <tr>
+                      <td>Availability</td>
+                      <td>Current plan</td>
+                      <td class="selected">Model eligible; verify execution</td>
+                      <td>Unavailable in this profile</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="box">
+                <h3>Journey and intervention point</h3>
+                <svg
+                  class="trace"
+                  viewBox="0 0 640 135"
+                  role="img"
+                  aria-label="Proposed journey rail from Rotterdam to a current position, then to Basel and the batch charge. Current position and intervention details need confirmation."
+                >
+                  <path class="line" d="M35 55 L220 55" />
+                  <path class="limit" d="M220 55 L480 55 L600 55" />
+                  <circle cx="35" cy="55" r="6" />
+                  <circle cx="220" cy="55" r="8" />
+                  <circle cx="480" cy="55" r="6" />
+                  <circle cx="600" cy="55" r="6" />
+                  <text x="12" y="88">Rotterdam</text>
+                  <text x="155" y="28">position: confirm</text>
+                  <text x="164" y="88">current leg</text>
+                  <text x="452" y="88">Basel</text>
+                  <text x="546" y="112">18:00 charge</text>
+                </svg>
+                <div class="note">
+                  Illustrative rail. Dashed path is planned, not tracked. Show
+                  confirmed intervention location before approval.
+                </div>
+              </div>
+              <details open>
+                <summary>When the request is a reroute</summary>
+                <p>
+                  Show the original and alternative corridors; road / river
+                  restrictions; confirmed transfer point, truck availability and
+                  capacity; additional handovers; refrigeration and product
+                  handling; revised ETA range; pickup/dock windows; incremental
+                  cost; and impact on every supplied batch.
+                </p>
+                <div class="box warning">
+                  No supported alternative route? Keep REROUTE unavailable and
+                  request feasibility evidence. Do not invent ETA or quality
+                  benefits.
+                </div>
+              </details>
+            </div>
+            <aside class="box recommendation stack">
+              <div class="eyebrow">PLAN REVIEW</div>
+              <h3>Expedite · proposed</h3>
+              <div class="checklist">
+                <label
+                  ><input type="checkbox" /> Carrier confirms service /
+                  slot</label
+                ><label
+                  ><input type="checkbox" /> Intervention leg is feasible</label
+                ><label
+                  ><input type="checkbox" /> Handling and refrigeration
+                  checked</label
+                ><label><input type="checkbox" /> Cost / budget approved</label
+                ><label
+                  ><input type="checkbox" /> Receiving window confirmed</label
+                >
+              </div>
+              <div class="note">
+                Checks are illustrative. Production implementation must retain
+                supporting references and block approval when required checks
+                are incomplete.
+              </div>
+              <button
+                class="primary"
+                data-decision="Review transport authorization"
+                data-context="Selected plan: EXPEDITE. Require confirmed carrier service, executable leg, handling plan, budget and receiving slot before actual authorization."
+              >
+                Review authorization…</button
+              ><button
+                class="secondary"
+                data-decision="Request reroute feasibility evidence"
+                data-context="REROUTE is currently unavailable. Request an alternative route, transfer point, carrier capacity, handling plan, quote and revised assessment."
+              >
+                Request reroute plan…
+              </button>
+            </aside>
+          </div>
+          <div class="log note" data-log tabindex="-1" aria-live="polite">
+            Decision must reference the selected alternative and the exact
+            assessment snapshot. Booking status is recorded separately.
+          </div>
+        </article>
+      </section>
+      <section class="turn" id="log-c">
+        <div class="variant-label">
+          <a href="#log-c">2c</a>Review queue: sort by batch consequence, route
+          blockage and missing confirmations
+        </div>
+        <article class="card stack">
+          <div class="row between">
+            <h2>Logistics intervention inbox</h2>
+            <span class="tag">ILLUSTRATIVE WORKFLOW</span>
+          </div>
+          <div class="tags">
+            <span class="tag">Expedite reviews</span
+            ><span class="tag">Reroute feasibility</span
+            ><span class="tag">Awaiting carrier</span
+            ><span class="tag">Authorized / not dispatched</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Request / shipment</th>
+                  <th>Batch impact</th>
+                  <th>Proposed action</th>
+                  <th>Blocking information</th>
+                  <th>Next step</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="selected">
+                  <td>LGR-DEMO-02<br />Rotterdam → Basel</td>
+                  <td>50 kg dependency<br />18:00 UTC charge</td>
+                  <td>EXPEDITE<br />Timing benefit modeled</td>
+                  <td>Service slot + quote</td>
+                  <td><a href="#log-b">Review plans →</a></td>
+                </tr>
+                <tr>
+                  <td>LGR-CONCEPT-03<br />Blocked corridor</td>
+                  <td>Impacted batches to confirm</td>
+                  <td>REROUTE requested<br />No supported comparison yet</td>
+                  <td>Transfer point + truck capacity + cold-chain plan</td>
+                  <td><a href="#log-b">Review feasibility →</a></td>
+                </tr>
+                <tr>
+                  <td>LGR-CONCEPT-04<br />Carrier follow-up</td>
+                  <td>Receiving appointment pending</td>
+                  <td>EXPEDITE proposed</td>
+                  <td>Carrier response</td>
+                  <td><a href="#log-a">Open request →</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="grid">
+            <div class="box">
+              <h3>Operator → logistics</h3>
+              Request with shipment, affected batches, original plan, proposed
+              intervention, evidence snapshot and reason.
+            </div>
+            <div class="box">
+              <h3>Logistics → execution</h3>
+              Authorize a specific plan or return for details. Dispatch and
+              updated arrival evidence follow separately; notify the operator
+              and retain any QA hold.
+            </div>
+          </div>
+          <div class="note">
+            Concept rows illustrate the future review workflow; only the
+            separate historical expedite assessment is a computed example. No
+            one-click transport authorization from the queue.
+          </div>
+        </article>
+      </section>
+    </main>
+    <dialog aria-labelledby="review-title">
+      <form>
+        <h2 id="review-title">Review transport plan</h2>
+        <p data-context></p>
+        <p class="note">
+          Preview only. Actual execution requires confirmed operational
+          prerequisites and a decision tied to an immutable assessment.
+        </p>
+        <label for="reason">Authorization reason / details requested</label
+        ><textarea
+          id="reason"
+          name="reason"
+          required
+          placeholder="What plan and evidence support the next step?"
+        ></textarea>
+        <p>
+          <label
+            ><input type="checkbox" name="reviewed" required /> I reviewed the
+            evidence and execution prerequisites.</label
+          >
+        </p>
+        <p data-error class="error" aria-live="polite"></p>
+        <div class="buttons">
+          <button class="primary" type="submit">Preview decision</button
+          ><button class="secondary" type="button" data-cancel>Cancel</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

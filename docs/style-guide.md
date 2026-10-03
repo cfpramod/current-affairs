@@ -1,5 +1,9 @@
 # Smartflow brand
 
+The [approver wireframe exploration](design/approver-wireframes.md) extends the
+supplied sketch-style operator reference for QA and logistics review. Its shared
+theme is a design artifact; production dashboard styling stays as described below.
+
 Smartflow connects logistics evidence to production decisions. Keep the existing dashboard typography, spacing and status colors. The new brand mark pairs a teal S silhouette with mint flow paths; status meaning continues to come from labeled UI controls and evidence.
 
 The transparent PNG is [smartflow-mark.png](../dashboard/public/brand/smartflow-mark.png), with an identical copy for the React demo's public assets. Use it with the Smartflow name in app navigation and alone for the favicon. Preserve its proportions and transparency; check contrast on light and dark backgrounds. Existing repository URLs, package namespaces and dataset IDs stay unchanged.
