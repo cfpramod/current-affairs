@@ -2,7 +2,7 @@
 
 ## Missing element
 
-Implement **batch-linked assessments from stored operations**. The existing worker evaluates three named retrospective logistics scenarios. It does not assess the 18 operational batches or link recommendations to their shipments, inventory and product-temperature histories.
+Implement **batch-linked assessments from stored operations**. The additive vertical slice is documented in [BATCH_ASSESSMENTS.md](BATCH_ASSESSMENTS.md); the original three named scenarios remain available. The requirements below describe the intended boundary and remaining limitations.
 
 Start from `feat/build-integration` in https://github.com/cfpramod/current-affairs. Read [BUILD_INTEGRATION.md](BUILD_INTEGRATION.md), [DATA_ENGINE.md](DATA_ENGINE.md), [operations examples](../data/examples/operations/README.md) and [the canonical interface](../pipeline/baselhack/interfaces.py). Reuse logistics/thermal/rules code where its assumptions apply. The fetched ML branch contained only the original scaffold at the last check; provide the implementation on a reviewable feature branch.
 
@@ -26,7 +26,7 @@ Provide separate answers for:
 2. Each incoming shipment's arrival by the batch deadline, including supported probabilities/ETA uncertainty.
 3. Actual product-temperature/QA evidence against the material range and excursion budget. Planned shipments without readings have unavailable evidence, not zero-excursion verdicts. Ambient exposure stays a distinct proxy; ML never authorizes pharmaceutical release.
 
-Compare eligible actions, explain the recommendation/alternatives and preserve provenance, assumptions and limitations. Buffer can protect production while incoming material remains exposed or late. Do not fabricate probabilities from fixture labels or special-case batch IDs.
+Compare eligible actions, explain the recommendation/alternatives and preserve provenance, assumptions and limitations. Before charge, Buffer can protect production while incoming material remains exposed or late. If planned_charge_at is at or before the cutoff, report a retrospective assessment with null action and preserve the facts; the snapshot cannot reconstruct reservation/QA state at the exact past charge time. Do not fabricate probabilities from fixture labels or special-case batch IDs.
 
 Add an additive shared contract containing dataset/batch IDs, shipment IDs, cutoff, input/evidence hash, model version, separate outcomes/probabilities, alternatives and provenance. Keep it in the canonical interface with a decision line and generated schemas/TypeScript. Coordinate with Laravel so both builders use this contract.
 
@@ -38,7 +38,7 @@ Use reference time 2026-10-03 12:00 UTC. IDs carry prefix `operations-demo-v1-`:
 
 | Batch | Evidence affecting the assessment |
 | --- | --- |
-| batch-001 | Normal arrived shipment; 50 kg released reservation for 50 kg demand |
+| batch-001 | Arrived shipment; 50 kg snapshot reservation for 50 kg demand; 10:00 charge already passed, so null action |
 | batch-002 | Heat-exposed shipment; 30 kg reservation and 20 kg shortfall |
 | batch-003 | Delayed incoming shipment, no released reservation |
 | batch-004 | Future planned shipment, no actual milestones/readings |
