@@ -1,6 +1,6 @@
 # Smartflow batch ML test data
 
-Status: done, ready to publish · Updated: 2026-10-03 · Branch: data/simulated-shipment-training
+Status: committed and pushed · Updated: 2026-10-03 · Branch: data/simulated-shipment-training
 
 ## Result
 
@@ -13,6 +13,8 @@ The self-contained data/ml/batch-tests-v1 folder and neighboring zip include REA
 ## Validation
 
 Package checksum/loading checks and a fitted synthetic baseline completed. Three new generator tests cover causal records, quantity conservation, explicit expected stock/QA/evidence cases, reproducible exports, zip integrity and disjoint chronological splits. Generation validates all 600 groups. The original 18-batch fixture is unchanged.
+
+Published as commit 80f9bf0; staged and push privacy checks passed.
 
 ## Next
 
