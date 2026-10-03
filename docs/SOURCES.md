@@ -1,5 +1,9 @@
 # Data sources and verification
 
+## Team-contributed simulated shipment features
+
+[Simulated shipment dataset](../data/simulated/README.md): 3,000 synthetic shipments and 14,252 observation windows contributed by @cfpramod on 3 October 2026. Existing scene route/material structures were varied with seeded synthetic weather, river sensitivity, timing and exposure assumptions. CSVs contain simulation-derived features and targets, not real shipment/customer data or additional provider observation records. Original shipment-level train/validation/test groups are retained; dimensions and SHA-256 checksums are in [manifest.json](../data/simulated/manifest.json). This dataset does not validate operational arrival accuracy or pharmaceutical quality; the field guide documents target leakage exclusions and missing raw histories.
+
 Retrieved 2–3 October 2026. Raw downloads stay in ignored data/raw/. Small scene evidence is in committed data/cache/. Real observations are never fabricated. Provider timestamps and values are preserved; sampling and simulated overrides are labelled.
 
 | Source | Endpoint / use | Caveat |

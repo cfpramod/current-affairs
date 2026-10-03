@@ -1,0 +1,99 @@
+{
+  "data_source": "SIMULATED",
+  "generation_seed": 20261003,
+  "shipments": 3000,
+  "files": {
+    "simulated_shipments_3000.csv": {
+      "rows": 3000,
+      "columns": 54,
+      "bytes": 2084883,
+      "sha256": "057103ceb15b462ed50054e5eb316321ae627a15a9e938d1388d286bab1f9edb",
+      "privacy_review_rows": 204
+    },
+    "simulated_shipment_observations.csv": {
+      "rows": 14252,
+      "columns": 54,
+      "bytes": 9495983,
+      "sha256": "329c3f70aaafe24624ca06ccc2e03939a52838d073f3b81c7c28592c6fd566b0",
+      "privacy_review_rows": 708
+    }
+  },
+  "column_names": [
+    "shipment_id",
+    "split",
+    "sample_index",
+    "sample_count",
+    "data_source",
+    "on_time",
+    "qa_budget_exceeded",
+    "remaining_min",
+    "time_to_slot_min",
+    "planned_remaining_min",
+    "river_route_level_cm",
+    "current_temp_c",
+    "recent_mean_c",
+    "recent_max_c",
+    "trend_c_per_min",
+    "excursion_min",
+    "budget_used",
+    "ambient_c",
+    "remaining_exposure_min",
+    "segment_code",
+    "route_progress",
+    "segment_elapsed_min",
+    "refrigerated",
+    "anomaly_temperature_change",
+    "anomaly_thermal_residual",
+    "anomaly_recent_temperature_std",
+    "anomaly_exposed",
+    "anomaly_ambient_difference",
+    "anomaly_delay_ratio",
+    "injected_spike_temperature_change",
+    "injected_spike_thermal_residual",
+    "injected_spike_recent_temperature_std",
+    "injected_spike_exposed",
+    "injected_spike_ambient_difference",
+    "injected_spike_delay_ratio",
+    "injected_frozen_temperature_change",
+    "injected_frozen_thermal_residual",
+    "injected_frozen_recent_temperature_std",
+    "injected_frozen_exposed",
+    "injected_frozen_ambient_difference",
+    "injected_frozen_delay_ratio",
+    "injected_gap_temperature_change",
+    "injected_gap_thermal_residual",
+    "injected_gap_recent_temperature_std",
+    "injected_gap_exposed",
+    "injected_gap_ambient_difference",
+    "injected_gap_delay_ratio",
+    "injected_delay_temperature_change",
+    "injected_delay_thermal_residual",
+    "injected_delay_recent_temperature_std",
+    "injected_delay_exposed",
+    "injected_delay_ambient_difference",
+    "injected_delay_delay_ratio",
+    "privacy_review"
+  ],
+  "splits": {
+    "train": {
+      "shipments": 1800,
+      "observations": 8516
+    },
+    "validation": {
+      "shipments": 600,
+      "observations": 2848
+    },
+    "test": {
+      "shipments": 600,
+      "observations": 2888
+    }
+  },
+  "non_feature_columns": [
+    "shipment_id",
+    "split",
+    "sample_index",
+    "sample_count",
+    "data_source",
+    "privacy_review"
+  ]
+}
