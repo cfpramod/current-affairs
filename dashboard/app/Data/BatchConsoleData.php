@@ -48,6 +48,8 @@ final class BatchConsoleData extends Data
         public bool $materialHeld = false,
         public bool $expediteAllowed = false,
         public ?string $expediteBlockedReason = null,
+        public bool $rerouteAllowed = false,
+        public ?string $rerouteBlockedReason = null,
         public bool $bufferAllowed = true,
         public ?string $bufferBlockedReason = null,
         public bool $runAllowed = true,

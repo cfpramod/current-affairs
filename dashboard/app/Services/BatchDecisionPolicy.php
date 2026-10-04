@@ -255,12 +255,12 @@ final readonly class BatchDecisionPolicy
             $incomingShipments = $assessment['incoming_shipments'] ?? [];
 
             if ($incomingDepKg <= 0 || $incomingShipments === []) {
-                throw new DecisionNotAllowed(sprintf('This batch has no incoming shipment dependency to %s.', strtolower($action->label())));
+                throw new DecisionNotAllowed(sprintf('This batch has no incoming shipment dependency to %s.', mb_strtolower($action->label())));
             }
 
             $allArrived = collect($incomingShipments)->every(fn (array $s): bool => ($s['status'] ?? null) === 'ARRIVED');
             if ($allArrived) {
-                throw new DecisionNotAllowed('Incoming shipments have already arrived; cannot expedite.');
+                throw new DecisionNotAllowed(sprintf('Incoming shipments have already arrived; cannot %s.', mb_strtolower($action->label())));
             }
 
             $hasUnavailable = collect($incomingShipments)->contains(fn (array $s): bool => ($s['status'] ?? null) === 'UNAVAILABLE');
@@ -268,25 +268,24 @@ final readonly class BatchDecisionPolicy
                 throw new DecisionNotAllowed('Incoming shipment timing is unavailable for transport actions.');
             }
 
-            if ($action === ShipmentAction::Expedite) {
-                if ($isOutOfZone || $activeQuarantine !== null) {
-                    $acceptedQuarantine = $this->findAcceptedQuarantine($assessment, $batchId);
+            // Expedite and reroute both spend on moving a held lot: same QA gate.
+            if ($isOutOfZone || $activeQuarantine !== null) {
+                $acceptedQuarantine = $this->findAcceptedQuarantine($assessment, $batchId);
 
-                    if ($acceptedQuarantine === null) {
-                        throw new DecisionNotAllowed('Expedite can only be requested after QA confirms the held lot is potentially usable.');
-                    }
+                if ($acceptedQuarantine === null) {
+                    throw new DecisionNotAllowed(sprintf('%s can only be requested after QA confirms the held lot is potentially usable.', $action->label()));
+                }
 
-                    if ($acceptedQuarantine->assessment_id !== $assessment['assessment_id']) {
-                        throw new DecisionNotAllowed('QA assessment is from different evidence; reload before deciding.');
-                    }
+                if ($acceptedQuarantine->assessment_id !== $assessment['assessment_id']) {
+                    throw new DecisionNotAllowed('QA assessment is from different evidence; reload before deciding.');
+                }
 
-                    if ($acceptedQuarantine->qa_prospect === QaProspect::Rejected) {
-                        throw new DecisionNotAllowed('QA rejected this lot for production; expedite is not allowed.');
-                    }
+                if ($acceptedQuarantine->qa_prospect === QaProspect::Rejected) {
+                    throw new DecisionNotAllowed(sprintf('QA rejected this lot for production; %s is not allowed.', mb_strtolower($action->label())));
+                }
 
-                    if ($acceptedQuarantine->qa_prospect !== QaProspect::PotentiallyUsable) {
-                        throw new DecisionNotAllowed('Expedite requires QA to record that the held lot is potentially usable.');
-                    }
+                if ($acceptedQuarantine->qa_prospect !== QaProspect::PotentiallyUsable) {
+                    throw new DecisionNotAllowed(sprintf('%s requires QA to record that the held lot is potentially usable.', $action->label()));
                 }
             }
         }
@@ -327,7 +326,7 @@ final readonly class BatchDecisionPolicy
         }
 
         // Transport approval revalidates held lot status and QA prospect
-        if ($decision->lane === DecisionLane::Transport && $decision->action === ShipmentAction::Expedite) {
+        if ($decision->lane === DecisionLane::Transport) {
             $isOutOfZone = $this->isOutOfZone($latestAssessment);
             $activeQuarantine = $this->findActiveQuarantine($latestAssessment, $decision->batch_id);
 
@@ -335,11 +334,11 @@ final readonly class BatchDecisionPolicy
                 $acceptedQuarantine = $this->findAcceptedQuarantine($latestAssessment, $decision->batch_id);
 
                 if ($acceptedQuarantine === null || $acceptedQuarantine->assessment_id !== $latestAssessment['assessment_id']) {
-                    throw new DecisionNotAllowed('Expedite requires QA confirmation of preliminary usability on current evidence.');
+                    throw new DecisionNotAllowed(sprintf('%s requires QA confirmation of preliminary usability on current evidence.', $decision->action->label()));
                 }
 
                 if ($acceptedQuarantine->qa_prospect !== QaProspect::PotentiallyUsable) {
-                    throw new DecisionNotAllowed('Cannot accept expedite: held lot does not have a positive preliminary QA prospect.');
+                    throw new DecisionNotAllowed(sprintf('Cannot accept %s: held lot does not have a positive preliminary QA prospect.', mb_strtolower($decision->action->label())));
                 }
             }
         }
@@ -358,6 +357,8 @@ final readonly class BatchDecisionPolicy
      *     materialHeld: bool,
      *     expediteAllowed: bool,
      *     expediteBlockedReason: ?string,
+     *     rerouteAllowed: bool,
+     *     rerouteBlockedReason: ?string,
      *     bufferAllowed: bool,
      *     bufferBlockedReason: ?string,
      *     runAllowed: bool,
@@ -411,20 +412,20 @@ final readonly class BatchDecisionPolicy
             default => null,
         };
 
-        // Expedite evaluation
+        // Transport evaluation: expedite and reroute share the same gates
         $hasDependency = $incomingDepKg > 0 && $incomingShipments !== [];
         $timingAvailable = $hasDependency && ! collect($incomingShipments)->contains(fn (array $s): bool => ($s['status'] ?? null) === 'UNAVAILABLE')
             && ! collect($incomingShipments)->every(fn (array $s): bool => ($s['status'] ?? null) === 'ARRIVED');
 
-        $expediteAllowed = ! $isRetrospective && $timingAvailable && (! $materialHeld || $qaProspect === QaProspect::PotentiallyUsable);
-        $expediteBlockedReason = match (true) {
+        $transportAllowed = ! $isRetrospective && $timingAvailable && (! $materialHeld || $qaProspect === QaProspect::PotentiallyUsable);
+        $transportBlockedReason = fn (ShipmentAction $action): ?string => match (true) {
             $isRetrospective => 'Retrospective assessment.',
             ! $hasDependency => 'No incoming shipment dependency.',
             ! $timingAvailable => 'Shipment timing unavailable or arrived.',
             ! $materialHeld => null,
             $activeMaterial?->status === BatchDecisionStatus::Pending => 'Quarantine is pending QA review.',
-            $qaProspect === QaProspect::Rejected => 'QA rejected this lot for production; expedite spend is blocked.',
-            $qaProspect !== QaProspect::PotentiallyUsable => 'Held lot requires QA preliminary prospect assessment before requesting expedite.',
+            $qaProspect === QaProspect::Rejected => sprintf('QA rejected this lot for production; %s spend is blocked.', mb_strtolower($action->label())),
+            $qaProspect !== QaProspect::PotentiallyUsable => sprintf('Held lot requires QA preliminary prospect assessment before requesting %s.', mb_strtolower($action->label())),
             default => null,
         };
 
@@ -434,8 +435,10 @@ final readonly class BatchDecisionPolicy
             'activeDecision' => $active === null ? null : BatchDecisionData::fromModel($active),
             'qaProspect' => $qaProspect,
             'materialHeld' => $materialHeld,
-            'expediteAllowed' => $expediteAllowed,
-            'expediteBlockedReason' => $expediteBlockedReason,
+            'expediteAllowed' => $transportAllowed,
+            'expediteBlockedReason' => $transportBlockedReason(ShipmentAction::Expedite),
+            'rerouteAllowed' => $transportAllowed,
+            'rerouteBlockedReason' => $transportBlockedReason(ShipmentAction::Reroute),
             'bufferAllowed' => $bufferAllowed,
             'bufferBlockedReason' => $bufferBlockedReason,
             'runAllowed' => $runAllowed,

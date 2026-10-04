@@ -289,7 +289,7 @@ const canReviewTransport = computed(
                         v-if="batch.materialHeld && !batch.expediteAllowed"
                         class="rounded border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-300"
                     >
-                        Expedite gated by QA
+                        Transport gated by QA
                     </span>
                     <span
                         v-else-if="batch.materialHeld && batch.expediteAllowed"
@@ -423,16 +423,31 @@ const canReviewTransport = computed(
                         </div>
 
                         <!-- REROUTE -->
-                        <div class="flex flex-col rounded-lg border p-2 text-xs gap-1 bg-card">
+                        <div
+                            class="flex flex-col rounded-lg border p-2 text-xs gap-1 bg-card"
+                            :class="!batch.rerouteAllowed ? 'opacity-80' : ''"
+                        >
                             <b class="text-sm">{{ actionLabels.REROUTE }}</b>
                             <span class="text-muted-foreground">Alternative route</span>
-                            <span class="text-[11px] text-muted-foreground">Needs Logistics review</span>
+                            <span
+                                v-if="!batch.rerouteAllowed"
+                                class="text-[11px] text-amber-700 dark:text-amber-400 font-medium"
+                            >
+                                {{ batch.rerouteBlockedReason }}
+                            </span>
+                            <span
+                                v-else-if="batch.materialHeld"
+                                class="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium"
+                            >
+                                Allowed: QA confirmed potentially usable
+                            </span>
+                            <span v-else class="text-[11px] text-muted-foreground">Needs Logistics review</span>
                             <div class="mt-auto pt-2">
                                 <Button
                                     size="sm"
                                     class="w-full"
                                     variant="outline"
-                                    :disabled="!canChooseTransport"
+                                    :disabled="!canChooseTransport || !batch.rerouteAllowed"
                                     @click="emit('choose', 'REROUTE')"
                                 >
                                     Reroute

@@ -215,6 +215,61 @@ test('a review while the engine is unreachable reports the outage instead of fai
     expect($decision->refresh()->status)->toBe(BatchDecisionStatus::Pending);
 });
 
+/** @return list<array<string, mixed>> The demo assessments with the hot batch's shipment timing modelled. */
+function hotAssessmentsWithTiming(): array
+{
+    $assessments = json_decode((string) file_get_contents(base_path('../output/batch-assessments-demo.json')), true, 512, JSON_THROW_ON_ERROR);
+
+    return array_map(fn (array $assessment): array => $assessment['batch_id'] === HOT_BATCH
+        ? [...$assessment, 'incoming_shipments' => array_map(fn (array $shipment): array => [...$shipment, 'status' => 'MODELED'], $assessment['incoming_shipments'])]
+        : $assessment, $assessments);
+}
+
+test('reroute is blocked on the console when shipment timing is unavailable', function () {
+    fakeEngine();
+
+    $this->actingAs(User::factory()->role(UserRole::Operator)->create())
+        ->get(route('batches.show', HOT_BATCH))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('batch.rerouteAllowed', false)
+            ->where('batch.rerouteBlockedReason', 'Shipment timing unavailable or arrived.'),
+        );
+
+    submitAs(UserRole::Operator, 'REROUTE')->assertSessionHasErrors(['decision' => 'Incoming shipment timing is unavailable for transport actions.']);
+});
+
+test('reroute of a held lot waits for the QA prospect, like expedite', function () {
+    fakeEngine(hotAssessmentsWithTiming());
+
+    $this->actingAs(User::factory()->role(UserRole::Operator)->create())
+        ->get(route('batches.show', HOT_BATCH))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('batch.rerouteAllowed', false)
+            ->where('batch.rerouteBlockedReason', 'Held lot requires QA preliminary prospect assessment before requesting reroute.')
+            ->where('batch.expediteBlockedReason', 'Held lot requires QA preliminary prospect assessment before requesting expedite.'),
+        );
+
+    submitAs(UserRole::Operator, 'REROUTE')
+        ->assertSessionHasErrors(['decision' => 'Reroute can only be requested after QA confirms the held lot is potentially usable.']);
+    expect(BatchDecision::query()->count())->toBe(0);
+});
+
+test('reroute opens once QA records the held lot as potentially usable', function () {
+    fakeEngine(hotAssessmentsWithTiming());
+    submitAs(UserRole::Operator, 'QUARANTINE');
+    reviewAs(UserRole::Qa, BatchDecision::query()->sole(), ['qa_prospect' => 'potentially_usable'])->assertSessionHasNoErrors();
+
+    $this->actingAs(User::factory()->role(UserRole::Operator)->create())
+        ->get(route('batches.show', HOT_BATCH))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('batch.rerouteAllowed', true)
+            ->where('batch.rerouteBlockedReason', null),
+        );
+
+    submitAs(UserRole::Operator, 'REROUTE')->assertSessionHasNoErrors();
+    expect(BatchDecision::query()->where('action', ShipmentAction::Reroute)->sole()->status)->toBe(BatchDecisionStatus::Pending);
+});
+
 test('demo decisions can be reset', function () {
     BatchDecision::factory()->count(2)->create(['batch_id' => HOT_BATCH]);
 

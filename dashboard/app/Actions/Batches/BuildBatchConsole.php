@@ -76,6 +76,8 @@ final readonly class BuildBatchConsole
             materialHeld: $state['materialHeld'],
             expediteAllowed: $state['expediteAllowed'],
             expediteBlockedReason: $state['expediteBlockedReason'],
+            rerouteAllowed: $state['rerouteAllowed'],
+            rerouteBlockedReason: $state['rerouteBlockedReason'],
             bufferAllowed: $state['bufferAllowed'],
             bufferBlockedReason: $state['bufferBlockedReason'],
             runAllowed: $state['runAllowed'],

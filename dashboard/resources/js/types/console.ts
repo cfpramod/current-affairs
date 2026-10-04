@@ -207,6 +207,8 @@ export type BatchConsole = Omit<BatchListItem, 'decision'> & {
     materialHeld: boolean;
     expediteAllowed: boolean;
     expediteBlockedReason: string | null;
+    rerouteAllowed: boolean;
+    rerouteBlockedReason: string | null;
     bufferAllowed: boolean;
     bufferBlockedReason: string | null;
     runAllowed: boolean;
