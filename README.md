@@ -107,7 +107,7 @@ Changing the interface file needs a line in [docs/decisions.md](docs/decisions.m
 
 **Sunday 4 Oct, FHNW Campus Dreispitz:** doors 13:00, **submission 15:00**, demos from 15:30.
 
-License: not yet decided by the team; until then, no license is granted. Data keeps its providers' terms.
+License: [MIT](LICENSE) for the project code. Data keeps its providers' terms (see [docs/SOURCES.md](docs/SOURCES.md)).
 
 ## Basel logistics data and simulation layer
 
