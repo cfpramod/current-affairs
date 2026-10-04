@@ -8,6 +8,7 @@ use App\Data\BatchConsoleData;
 use App\Data\BatchDecisionData;
 use App\Data\BatchRecommendationData;
 use App\Exceptions\DataEngineUnavailable;
+use App\Exceptions\DecisionNotAllowed;
 use App\Integrations\DataEngine;
 use App\Models\BatchDecision;
 use App\Services\BatchDecisionPolicy;
@@ -27,6 +28,7 @@ final readonly class BuildBatchConsole
      * Build the console for a batch, or null when no assessment is stored for it.
      *
      * @throws DataEngineUnavailable
+     * @throws DecisionNotAllowed when the shipment and lot linkage can't be verified
      */
     public function handle(string $batchId): ?BatchConsoleData
     {

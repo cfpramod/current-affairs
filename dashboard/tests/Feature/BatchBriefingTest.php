@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Actions\Batches\BriefBatch;
 use App\Ai\BatchBriefingAgent;
+use App\Enums\BriefingSource;
 use App\Models\BatchBriefing;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
@@ -35,10 +36,10 @@ test('local Codex is used without an API key and its cached briefing is reused',
     config(['briefing.codex.enabled' => false]);
     $second = app(BriefBatch::class)->handle(hotAssessment());
 
-    expect($first->source)->toBe('codex')
-        ->and($second->source)->toBe('codex')
+    expect($first->source)->toBe(BriefingSource::Codex)
+        ->and($second->source)->toBe(BriefingSource::Codex)
         ->and($second->headline)->toBe($first->headline)
-        ->and(BatchBriefing::query()->sole()->source)->toBe('codex');
+        ->and(BatchBriefing::query()->sole()->source)->toBe(BriefingSource::Codex);
     BatchBriefingAgent::assertNeverPrompted();
     Process::assertRan(fn ($process) => in_array('read-only', $process->command, true)
         && str_contains($process->input, '"action":"QUARANTINE"')
@@ -56,7 +57,7 @@ test('API failure tries local Codex before the template', function () {
         return Process::result();
     });
 
-    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe('codex');
+    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe(BriefingSource::Codex);
     Process::assertRanTimes(fn ($process) => is_array($process->command), 1);
 });
 
@@ -69,7 +70,7 @@ test('unavailable or invalid Codex output falls back without caching', function 
         return Process::result(exitCode: $exitCode);
     });
 
-    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe('template')
+    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe(BriefingSource::Template)
         ->and(BatchBriefing::query()->count())->toBe(0);
 })->with([
     'CLI failed' => ['{}', 1],
@@ -82,7 +83,7 @@ test('a timed out local Codex process falls back to the template', function () {
     config(['briefing.enabled' => false, 'briefing.codex.enabled' => true]);
     Process::fake(fn () => throw new RuntimeException('Process timed out'));
 
-    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe('template')
+    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe(BriefingSource::Template)
         ->and(BatchBriefing::query()->count())->toBe(0);
 });
 
@@ -100,7 +101,7 @@ test('without an API key the briefing is a template built from the stored eviden
 
     $briefing = app(BriefBatch::class)->handle(hotAssessment());
 
-    expect($briefing->source)->toBe('template')
+    expect($briefing->source)->toBe(BriefingSource::Template)
         ->and($briefing->headline)->toBe('Over temperature budget: 148 of 120 min outside 2–8 °C')
         ->and($briefing->summary)->toContain('The model recommends QUARANTINE')
         ->and($briefing->qaNote)->not->toBeNull();
@@ -119,7 +120,7 @@ test('with an API key the LLM words the facts once and the briefing is reused', 
     $first = app(BriefBatch::class)->handle(hotAssessment());
     $second = app(BriefBatch::class)->handle(hotAssessment());
 
-    expect($first->source)->toBe('llm')
+    expect($first->source)->toBe(BriefingSource::Llm)
         ->and($first->model)->toBe('claude-opus-5-5')
         ->and($second->headline)->toBe('Batch 002 should not charge: the lot overheated')
         ->and(BatchBriefing::query()->sole()->assessment_id)->toBe(hotAssessmentId());
@@ -135,7 +136,7 @@ test('a provider error falls back to the template without storing anything', fun
 
     $briefing = app(BriefBatch::class)->handle(hotAssessment());
 
-    expect($briefing->source)->toBe('template')
+    expect($briefing->source)->toBe(BriefingSource::Template)
         ->and(BatchBriefing::query()->count())->toBe(0);
 });
 
@@ -143,7 +144,7 @@ test('an empty LLM answer falls back to the template', function () {
     config(['briefing.enabled' => true]);
     BatchBriefingAgent::fake([['headline' => '', 'summary' => '', 'qa_note' => null]]);
 
-    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe('template')
+    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe(BriefingSource::Template)
         ->and(BatchBriefing::query()->count())->toBe(0);
 });
 

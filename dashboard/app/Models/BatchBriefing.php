@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\BriefingSource;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,11 +15,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $assessment_id
  * @property string $batch_id
  * @property string $model
- * @property string $source
+ * @property BriefingSource $source
  * @property string $headline
  * @property string $summary
  * @property ?string $qa_note
  * @property-read CarbonInterface $created_at
  * @property-read CarbonInterface $updated_at
  */
-final class BatchBriefing extends Model {}
+final class BatchBriefing extends Model
+{
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'source' => BriefingSource::class,
+        ];
+    }
+}

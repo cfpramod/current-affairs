@@ -6,6 +6,7 @@ namespace App\Actions\Batches;
 
 use App\Ai\BatchBriefingAgent;
 use App\Data\BatchBriefingData;
+use App\Enums\BriefingSource;
 use App\Models\BatchBriefing;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Log;
@@ -20,11 +21,11 @@ use Throwable;
  * template. Page loads only read the stored briefing (`stored`), so a slow or
  * failing provider never blocks the console.
  */
-final class BriefBatch
+final readonly class BriefBatch
 {
     private const string TIMEZONE = 'Europe/Zurich';
 
-    public function __construct(private readonly BriefBatchWithCodex $codex) {}
+    public function __construct(private BriefBatchWithCodex $codex) {}
 
     /**
      * @param  array<string, mixed>  $assessment
@@ -50,7 +51,7 @@ final class BriefBatch
         $output = $this->codex->handle($facts);
 
         if ($output !== null) {
-            return $this->store($assessment, $output, 'codex', (string) (config('briefing.codex.model') ?: 'Codex CLI'));
+            return $this->store($assessment, $output, BriefingSource::Codex, (string) (config('briefing.codex.model') ?: 'Codex CLI'));
         }
 
         return $this->template($facts);
@@ -106,7 +107,7 @@ final class BriefBatch
                 return null;
             }
 
-            return $this->store($assessment, ['headline' => $headline, 'summary' => $summary, 'qa_note' => $qaNote], 'llm', $model);
+            return $this->store($assessment, ['headline' => $headline, 'summary' => $summary, 'qa_note' => $qaNote], BriefingSource::Llm, $model);
         } catch (Throwable $throwable) {
             Log::warning('API batch briefing unavailable; trying local Codex.', [
                 'assessment_id' => $assessment['assessment_id'],
@@ -121,7 +122,7 @@ final class BriefBatch
      * @param  array<string, mixed>  $assessment
      * @param  array{headline: string, summary: string, qa_note: ?string}  $output
      */
-    private function store(array $assessment, array $output, string $source, string $model): BatchBriefingData
+    private function store(array $assessment, array $output, BriefingSource $source, string $model): BatchBriefingData
     {
         $stored = BatchBriefing::query()->firstOrCreate(['assessment_id' => $assessment['assessment_id']], [
             'batch_id' => $assessment['batch_id'],
@@ -222,7 +223,7 @@ final class BriefBatch
             headline: $headline,
             summary: implode(' ', $sentences),
             qaNote: $exceeded !== [] ? 'QA must review the temperature evidence before this lot is used; quarantine hold and transport logistics remain separate lanes, and release stays a separate human decision.' : null,
-            source: 'template',
+            source: BriefingSource::Template,
             model: null,
         );
     }

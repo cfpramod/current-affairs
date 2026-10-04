@@ -318,7 +318,9 @@ void test('missing timing probabilities and ETAs remain unavailable with their b
         );
         assert.equal(
             actionLabel(record.recommendation.action),
-            overBudget ? 'Quarantine · hold for QA review' : 'No forward action',
+            overBudget
+                ? 'Quarantine · hold for QA review'
+                : 'No forward action',
         );
     }
     assert.equal(incomingStatusLabel('MODELED'), 'Timing modeled');

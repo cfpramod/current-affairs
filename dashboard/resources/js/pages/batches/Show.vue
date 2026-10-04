@@ -110,7 +110,10 @@ function openReview(decision: BatchDecision, accept: boolean): void {
     reviewForm.reset();
     reviewForm.clearErrors();
     reviewForm.accept = accept;
-    reviewForm.qa_prospect = decision.action === 'QUARANTINE' && accept ? 'potentially_usable' : null;
+    reviewForm.qa_prospect =
+        decision.action === 'QUARANTINE' && accept
+            ? 'potentially_usable'
+            : null;
     reviewOpen.value = true;
 }
 
@@ -376,7 +379,9 @@ function resetDemo(): void {
                                 reviewingDecision
                                     ? actionLabels[reviewingDecision.action]
                                     : batch.activeDecision
-                                      ? actionLabels[batch.activeDecision.action]
+                                      ? actionLabels[
+                                            batch.activeDecision.action
+                                        ]
                                       : ''
                             }}
                         </DialogTitle>
@@ -405,34 +410,53 @@ function resetDemo(): void {
                             v-if="reviewingDecision?.action === 'QUARANTINE'"
                             class="flex flex-col gap-2 rounded-lg border bg-muted/40 p-3 text-sm"
                         >
-                            <span class="font-medium">QA Preliminary Prospect Assessment</span>
+                            <span class="font-medium"
+                                >QA Preliminary Prospect Assessment</span
+                            >
                             <span class="text-xs text-muted-foreground">
-                                Quarantined material is blocked from production. State whether preliminary checks indicate potential usability for salvage transport.
+                                Quarantined material is blocked from production.
+                                State whether preliminary checks indicate
+                                potential usability for salvage transport.
                             </span>
-                            <div class="flex flex-col gap-1.5 mt-1">
-                                <label class="flex items-center gap-2 text-xs cursor-pointer">
+                            <div class="mt-1 flex flex-col gap-1.5">
+                                <label
+                                    class="flex cursor-pointer items-center gap-2 text-xs"
+                                >
                                     <input
                                         v-model="reviewForm.qa_prospect"
                                         type="radio"
                                         value="potentially_usable"
                                     />
-                                    <span><b>Potentially usable after checks</b> — allows conditional expedite</span>
+                                    <span
+                                        ><b>Potentially usable after checks</b>
+                                        — allows conditional expedite</span
+                                    >
                                 </label>
-                                <label class="flex items-center gap-2 text-xs cursor-pointer">
+                                <label
+                                    class="flex cursor-pointer items-center gap-2 text-xs"
+                                >
                                     <input
                                         v-model="reviewForm.qa_prospect"
                                         type="radio"
                                         value="rejected"
                                     />
-                                    <span><b>Rejected for production</b> — blocks salvage expedite</span>
+                                    <span
+                                        ><b>Rejected for production</b> — blocks
+                                        salvage expedite</span
+                                    >
                                 </label>
-                                <label class="flex items-center gap-2 text-xs cursor-pointer">
+                                <label
+                                    class="flex cursor-pointer items-center gap-2 text-xs"
+                                >
                                     <input
                                         v-model="reviewForm.qa_prospect"
                                         type="radio"
                                         value="unknown"
                                     />
-                                    <span><b>Unknown / checks pending</b> — expedite blocked pending checks</span>
+                                    <span
+                                        ><b>Unknown / checks pending</b> —
+                                        expedite blocked pending checks</span
+                                    >
                                 </label>
                             </div>
                         </div>

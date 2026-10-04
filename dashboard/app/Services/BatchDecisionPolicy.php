@@ -16,6 +16,7 @@ use App\Integrations\DataEngine;
 use App\Models\BatchDecision;
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 final readonly class BatchDecisionPolicy
@@ -57,7 +58,7 @@ final readonly class BatchDecisionPolicy
         foreach ($shipmentIds as $shipmentId) {
             $matched = $shipmentsById->get($shipmentId);
 
-            if (! is_array($matched) || ! isset($matched['lot_id']) || ! is_string($matched['lot_id']) || $matched['lot_id'] === '') {
+            if ($matched === null || ! isset($matched['lot_id']) || $matched['lot_id'] === '') {
                 throw new DecisionNotAllowed(sprintf('Shipment %s has no verified lot linkage in dataset %s.', $shipmentId, $datasetId));
             }
 
@@ -135,6 +136,8 @@ final readonly class BatchDecisionPolicy
      * Find active quarantine covering this batch or any of its affected shipments/lots.
      *
      * @param  array<string, mixed>  $assessment
+     *
+     * @throws DecisionNotAllowed
      */
     public function findActiveQuarantine(array $assessment, string $batchId): ?BatchDecision
     {
@@ -145,7 +148,7 @@ final readonly class BatchDecisionPolicy
             ->where('dataset_id', $datasetId)
             ->where('action', ShipmentAction::Quarantine)
             ->active()
-            ->where(function ($query) use ($batchId, $linkage) {
+            ->where(function (Builder $query) use ($batchId, $linkage): void {
                 $query->where('batch_id', $batchId);
 
                 if ($linkage['shipment_ids'] !== []) {
@@ -163,6 +166,8 @@ final readonly class BatchDecisionPolicy
      * Find accepted quarantine for this batch or any of its affected shipments/lots.
      *
      * @param  array<string, mixed>  $assessment
+     *
+     * @throws DecisionNotAllowed
      */
     public function findAcceptedQuarantine(array $assessment, string $batchId): ?BatchDecision
     {
@@ -173,7 +178,7 @@ final readonly class BatchDecisionPolicy
             ->where('dataset_id', $datasetId)
             ->where('action', ShipmentAction::Quarantine)
             ->where('status', BatchDecisionStatus::Accepted)
-            ->where(function ($query) use ($batchId, $linkage) {
+            ->where(function (Builder $query) use ($batchId, $linkage): void {
                 $query->where('batch_id', $batchId);
 
                 if ($linkage['shipment_ids'] !== []) {
@@ -230,7 +235,7 @@ final readonly class BatchDecisionPolicy
                     throw new DecisionNotAllowed('Observed temperature excursion requires quarantine.');
                 }
 
-                if ($activeQuarantine !== null) {
+                if ($activeQuarantine instanceof BatchDecision) {
                     throw new DecisionNotAllowed('Material is quarantined; run as planned is not allowed.');
                 }
 
@@ -252,7 +257,7 @@ final readonly class BatchDecisionPolicy
 
         // 3. Transport lane rules
         if ($lane === DecisionLane::Transport) {
-            $incomingShipments = $assessment['incoming_shipments'] ?? [];
+            $incomingShipments = $this->incomingShipments($assessment);
 
             if ($incomingDepKg <= 0 || $incomingShipments === []) {
                 throw new DecisionNotAllowed(sprintf('This batch has no incoming shipment dependency to %s.', mb_strtolower($action->label())));
@@ -269,10 +274,10 @@ final readonly class BatchDecisionPolicy
             }
 
             // Expedite and reroute both spend on moving a held lot: same QA gate.
-            if ($isOutOfZone || $activeQuarantine !== null) {
+            if ($isOutOfZone || $activeQuarantine instanceof BatchDecision) {
                 $acceptedQuarantine = $this->findAcceptedQuarantine($assessment, $batchId);
 
-                if ($acceptedQuarantine === null) {
+                if (! $acceptedQuarantine instanceof BatchDecision) {
                     throw new DecisionNotAllowed(sprintf('%s can only be requested after QA confirms the held lot is potentially usable.', $action->label()));
                 }
 
@@ -330,10 +335,10 @@ final readonly class BatchDecisionPolicy
             $isOutOfZone = $this->isOutOfZone($latestAssessment);
             $activeQuarantine = $this->findActiveQuarantine($latestAssessment, $decision->batch_id);
 
-            if ($isOutOfZone || $activeQuarantine !== null) {
+            if ($isOutOfZone || $activeQuarantine instanceof BatchDecision) {
                 $acceptedQuarantine = $this->findAcceptedQuarantine($latestAssessment, $decision->batch_id);
 
-                if ($acceptedQuarantine === null || $acceptedQuarantine->assessment_id !== $latestAssessment['assessment_id']) {
+                if (! $acceptedQuarantine instanceof BatchDecision || $acceptedQuarantine->assessment_id !== $latestAssessment['assessment_id']) {
                     throw new DecisionNotAllowed(sprintf('%s requires QA confirmation of preliminary usability on current evidence.', $decision->action->label()));
                 }
 
@@ -364,6 +369,8 @@ final readonly class BatchDecisionPolicy
      *     runAllowed: bool,
      *     runBlockedReason: ?string
      * }
+     *
+     * @throws DecisionNotAllowed
      */
     public function evaluateConsoleState(array $assessment, string $batchId, Collection $decisions): array
     {
@@ -378,21 +385,21 @@ final readonly class BatchDecisionPolicy
         $isOutOfZone = $this->isOutOfZone($assessment);
         $activeQuarantine = $this->findActiveQuarantine($assessment, $batchId);
         $acceptedQuarantine = $this->findAcceptedQuarantine($assessment, $batchId);
-        $qaProspect = ($acceptedQuarantine?->assessment_id === $assessment['assessment_id'])
+        $qaProspect = $acceptedQuarantine instanceof BatchDecision && $acceptedQuarantine->assessment_id === $assessment['assessment_id']
             ? $acceptedQuarantine->qa_prospect
             : null;
 
         $materialHeld = ($activeMaterial?->action === ShipmentAction::Quarantine)
-            || ($activeQuarantine !== null)
+            || ($activeQuarantine instanceof BatchDecision)
             || $isOutOfZone;
 
         $isRetrospective = $this->isRetrospective($assessment);
         $incomingDepKg = (float) ($assessment['production_readiness']['incoming_dependency_kg'] ?? 0);
-        $incomingShipments = $assessment['incoming_shipments'] ?? [];
+        $incomingShipments = $this->incomingShipments($assessment);
         $isIncomplete = $this->isIncompleteTemperature($assessment);
 
         // Run as planned evaluation
-        $runAllowed = ! $isRetrospective && ! $materialHeld && ! ($incomingDepKg > 0 && $isIncomplete);
+        $runAllowed = ! $isRetrospective && ! $materialHeld && ($incomingDepKg <= 0 || ! $isIncomplete);
         $runBlockedReason = match (true) {
             $isRetrospective => 'Retrospective assessment.',
             $materialHeld => 'Material is held / out of zone.',
@@ -444,5 +451,18 @@ final readonly class BatchDecisionPolicy
             'runAllowed' => $runAllowed,
             'runBlockedReason' => $runBlockedReason,
         ];
+    }
+
+    /**
+     * The assessment's incoming shipments, keeping only well-formed records.
+     *
+     * @param  array<string, mixed>  $assessment
+     * @return list<array<string, mixed>>
+     */
+    private function incomingShipments(array $assessment): array
+    {
+        $shipments = $assessment['incoming_shipments'] ?? [];
+
+        return is_array($shipments) ? array_values(array_filter($shipments, is_array(...))) : [];
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Batches;
 
+use App\Enums\BriefingSource;
 use App\Exceptions\DataEngineUnavailable;
 use App\Integrations\DataEngine;
 
@@ -18,7 +19,7 @@ final readonly class PrepareBatchBriefings
      * Brief the latest assessment of every batch ahead of time, so no page
      * load waits on the provider. Returns each batch's briefing source.
      *
-     * @return array<string, string>
+     * @return array<string, BriefingSource>
      *
      * @throws DataEngineUnavailable
      */

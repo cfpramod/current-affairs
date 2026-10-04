@@ -2,7 +2,12 @@
 import { computed } from 'vue';
 import { actionLabels, roleLabels } from '@/components/console/format';
 import { Button } from '@/components/ui/button';
-import type { ActionKey, BatchConsole, BatchDecision, Role } from '@/types/console';
+import type {
+    ActionKey,
+    BatchConsole,
+    BatchDecision,
+    Role,
+} from '@/types/console';
 
 const props = defineProps<{ batch: BatchConsole; role: Role }>();
 
@@ -22,13 +27,17 @@ const activeTransport = computed(() => props.batch.activeTransportDecision);
 
 const lastDeniedMaterial = computed(() =>
     !activeMaterial.value
-        ? (props.batch.decisions.find((d) => d.lane === 'material' && d.status === 'denied') ?? null)
+        ? (props.batch.decisions.find(
+              (d) => d.lane === 'material' && d.status === 'denied',
+          ) ?? null)
         : null,
 );
 
 const lastDeniedTransport = computed(() =>
     !activeTransport.value
-        ? (props.batch.decisions.find((d) => d.lane === 'transport' && d.status === 'denied') ?? null)
+        ? (props.batch.decisions.find(
+              (d) => d.lane === 'transport' && d.status === 'denied',
+          ) ?? null)
         : null,
 );
 
@@ -104,9 +113,11 @@ const canReviewTransport = computed(
         <!-- Independent Lanes Side by Side -->
         <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
             <!-- Lane 1: Material Disposition -->
-            <div class="flex flex-col gap-3 rounded-xl border p-4 bg-muted/20">
+            <div class="flex flex-col gap-3 rounded-xl border bg-muted/20 p-4">
                 <div class="flex items-center justify-between border-b pb-2">
-                    <span class="text-sm font-bold tracking-wide uppercase text-muted-foreground">
+                    <span
+                        class="text-sm font-bold tracking-wide text-muted-foreground uppercase"
+                    >
                         Lane 1: Material Disposition
                     </span>
                     <span
@@ -127,8 +138,10 @@ const canReviewTransport = computed(
                             : 'border-amber-500/60 bg-amber-50/30 dark:bg-amber-950/20'
                     "
                 >
-                    <div class="flex flex-wrap items-baseline justify-between gap-1">
-                        <span class="font-semibold text-base">
+                    <div
+                        class="flex flex-wrap items-baseline justify-between gap-1"
+                    >
+                        <span class="text-base font-semibold">
                             {{ activeMaterial.submittedBy }}:
                             <span class="text-sky-700 dark:text-sky-400">
                                 {{ actionLabels[activeMaterial.action] }}
@@ -159,18 +172,36 @@ const canReviewTransport = computed(
                         class="rounded border border-sky-300 bg-sky-50 p-2 text-xs text-sky-900 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-200"
                     >
                         <b>QA prospect:</b>
-                        {{ prospectLabels[activeMaterial.qaProspect] ?? activeMaterial.qaProspect }}
-                        <span class="block text-[11px] text-muted-foreground mt-0.5">
-                            Preliminary check only; material remains quarantined from production.
+                        {{
+                            prospectLabels[activeMaterial.qaProspect] ??
+                            activeMaterial.qaProspect
+                        }}
+                        <span
+                            class="mt-0.5 block text-[11px] text-muted-foreground"
+                        >
+                            Preliminary check only; material remains quarantined
+                            from production.
                         </span>
                     </div>
 
-                    <template v-if="activeMaterial.status === 'accepted' && activeMaterial.reviewedBy">
+                    <template
+                        v-if="
+                            activeMaterial.status === 'accepted' &&
+                            activeMaterial.reviewedBy
+                        "
+                    >
                         <p class="text-xs">
-                            <span class="text-muted-foreground">{{ activeMaterial.reviewedBy }} ({{ roleLabels[activeMaterial.requiredRole] }}):</span>
+                            <span class="text-muted-foreground"
+                                >{{ activeMaterial.reviewedBy }} ({{
+                                    roleLabels[activeMaterial.requiredRole]
+                                }}):</span
+                            >
                             “{{ activeMaterial.reviewReason }}”
                         </p>
-                        <p v-if="activeMaterial.nextAction" class="text-xs font-semibold">
+                        <p
+                            v-if="activeMaterial.nextAction"
+                            class="text-xs font-semibold"
+                        >
                             Next action: {{ activeMaterial.nextAction }}
                         </p>
                     </template>
@@ -199,22 +230,40 @@ const canReviewTransport = computed(
                         v-if="lastDeniedMaterial"
                         class="rounded-lg border border-red-500/50 p-2 text-xs"
                     >
-                        <b>{{ roleLabels[lastDeniedMaterial.requiredRole] }} denied {{ actionLabels[lastDeniedMaterial.action] }}:</b>
-                        “{{ lastDeniedMaterial.reviewReason }}” — {{ lastDeniedMaterial.reviewedBy }}
+                        <b
+                            >{{ roleLabels[lastDeniedMaterial.requiredRole] }}
+                            denied
+                            {{ actionLabels[lastDeniedMaterial.action] }}:</b
+                        >
+                        “{{ lastDeniedMaterial.reviewReason }}” —
+                        {{ lastDeniedMaterial.reviewedBy }}
                     </div>
 
-                    <p v-if="batch.retrospective" class="text-xs text-muted-foreground">
+                    <p
+                        v-if="batch.retrospective"
+                        class="text-xs text-muted-foreground"
+                    >
                         Retrospective: charge time has passed.
                     </p>
-                    <p v-else-if="role !== 'operator'" class="text-xs text-muted-foreground">
+                    <p
+                        v-else-if="role !== 'operator'"
+                        class="text-xs text-muted-foreground"
+                    >
                         Waiting for operator material selection.
                     </p>
                     <div v-else class="grid grid-cols-1 gap-2 sm:grid-cols-3">
                         <!-- QUARANTINE -->
-                        <div class="flex flex-col rounded-lg border p-2 text-xs gap-1 bg-card">
+                        <div
+                            class="flex flex-col gap-1 rounded-lg border bg-card p-2 text-xs"
+                        >
                             <b class="text-sm">{{ actionLabels.QUARANTINE }}</b>
-                            <span class="text-muted-foreground">Hold lot for QA checks</span>
-                            <span class="text-[11px] text-amber-700 dark:text-amber-400">Needs QA review</span>
+                            <span class="text-muted-foreground"
+                                >Hold lot for QA checks</span
+                            >
+                            <span
+                                class="text-[11px] text-amber-700 dark:text-amber-400"
+                                >Needs QA review</span
+                            >
                             <div class="mt-auto pt-2">
                                 <Button
                                     size="sm"
@@ -229,22 +278,33 @@ const canReviewTransport = computed(
                         </div>
 
                         <!-- BUFFER -->
-                        <div class="flex flex-col rounded-lg border p-2 text-xs gap-1 bg-card">
+                        <div
+                            class="flex flex-col gap-1 rounded-lg border bg-card p-2 text-xs"
+                        >
                             <b class="text-sm">{{ actionLabels.BUFFER }}</b>
-                            <span class="text-muted-foreground">Charge from safety stock</span>
+                            <span class="text-muted-foreground"
+                                >Charge from safety stock</span
+                            >
                             <span
                                 v-if="!batch.bufferAllowed"
-                                class="text-[11px] text-amber-700 dark:text-amber-400 font-medium"
+                                class="text-[11px] font-medium text-amber-700 dark:text-amber-400"
                             >
                                 {{ batch.bufferBlockedReason }}
                             </span>
-                            <span v-else class="text-[11px] text-muted-foreground">Takes effect now</span>
+                            <span
+                                v-else
+                                class="text-[11px] text-muted-foreground"
+                                >Takes effect now</span
+                            >
                             <div class="mt-auto pt-2">
                                 <Button
                                     size="sm"
                                     class="w-full"
                                     variant="outline"
-                                    :disabled="!canChooseMaterial || !batch.bufferAllowed"
+                                    :disabled="
+                                        !canChooseMaterial ||
+                                        !batch.bufferAllowed
+                                    "
                                     @click="emit('choose', 'BUFFER')"
                                 >
                                     Buffer stock
@@ -253,22 +313,34 @@ const canReviewTransport = computed(
                         </div>
 
                         <!-- RUN AS PLANNED -->
-                        <div class="flex flex-col rounded-lg border p-2 text-xs gap-1 bg-card">
-                            <b class="text-sm">{{ actionLabels.RUN_AS_PLANNED }}</b>
-                            <span class="text-muted-foreground">Charge planned lot</span>
+                        <div
+                            class="flex flex-col gap-1 rounded-lg border bg-card p-2 text-xs"
+                        >
+                            <b class="text-sm">{{
+                                actionLabels.RUN_AS_PLANNED
+                            }}</b>
+                            <span class="text-muted-foreground"
+                                >Charge planned lot</span
+                            >
                             <span
                                 v-if="!batch.runAllowed"
-                                class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold"
+                                class="text-[11px] font-semibold text-rose-600 dark:text-rose-400"
                             >
                                 {{ batch.runBlockedReason }}
                             </span>
-                            <span v-else class="text-[11px] text-muted-foreground">Takes effect now</span>
+                            <span
+                                v-else
+                                class="text-[11px] text-muted-foreground"
+                                >Takes effect now</span
+                            >
                             <div class="mt-auto pt-2">
                                 <Button
                                     size="sm"
                                     class="w-full"
                                     variant="outline"
-                                    :disabled="!canChooseMaterial || !batch.runAllowed"
+                                    :disabled="
+                                        !canChooseMaterial || !batch.runAllowed
+                                    "
                                     @click="emit('choose', 'RUN_AS_PLANNED')"
                                 >
                                     Run planned
@@ -280,9 +352,11 @@ const canReviewTransport = computed(
             </div>
 
             <!-- Lane 2: Transport Logistics -->
-            <div class="flex flex-col gap-3 rounded-xl border p-4 bg-muted/20">
+            <div class="flex flex-col gap-3 rounded-xl border bg-muted/20 p-4">
                 <div class="flex items-center justify-between border-b pb-2">
-                    <span class="text-sm font-bold tracking-wide uppercase text-muted-foreground">
+                    <span
+                        class="text-sm font-bold tracking-wide text-muted-foreground uppercase"
+                    >
                         Lane 2: Transport Logistics
                     </span>
                     <span
@@ -309,8 +383,10 @@ const canReviewTransport = computed(
                             : 'border-amber-500/60 bg-amber-50/30 dark:bg-amber-950/20'
                     "
                 >
-                    <div class="flex flex-wrap items-baseline justify-between gap-1">
-                        <span class="font-semibold text-base">
+                    <div
+                        class="flex flex-wrap items-baseline justify-between gap-1"
+                    >
+                        <span class="text-base font-semibold">
                             {{ activeTransport.submittedBy }}:
                             <span class="text-sky-700 dark:text-sky-400">
                                 {{ actionLabels[activeTransport.action] }}
@@ -340,15 +416,28 @@ const canReviewTransport = computed(
                         v-if="activeTransport.status === 'accepted'"
                         class="rounded border border-amber-300 bg-amber-50/70 p-2 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
                     >
-                        <b>Note:</b> Transport approval accelerates movement to controlled storage; material hold remains active.
+                        <b>Note:</b> Transport approval accelerates movement to
+                        controlled storage; material hold remains active.
                     </div>
 
-                    <template v-if="activeTransport.status === 'accepted' && activeTransport.reviewedBy">
+                    <template
+                        v-if="
+                            activeTransport.status === 'accepted' &&
+                            activeTransport.reviewedBy
+                        "
+                    >
                         <p class="text-xs">
-                            <span class="text-muted-foreground">{{ activeTransport.reviewedBy }} ({{ roleLabels[activeTransport.requiredRole] }}):</span>
+                            <span class="text-muted-foreground"
+                                >{{ activeTransport.reviewedBy }} ({{
+                                    roleLabels[activeTransport.requiredRole]
+                                }}):</span
+                            >
                             “{{ activeTransport.reviewReason }}”
                         </p>
-                        <p v-if="activeTransport.nextAction" class="text-xs font-semibold">
+                        <p
+                            v-if="activeTransport.nextAction"
+                            class="text-xs font-semibold"
+                        >
                             Next action: {{ activeTransport.nextAction }}
                         </p>
                     </template>
@@ -377,44 +466,64 @@ const canReviewTransport = computed(
                         v-if="lastDeniedTransport"
                         class="rounded-lg border border-red-500/50 p-2 text-xs"
                     >
-                        <b>{{ roleLabels[lastDeniedTransport.requiredRole] }} denied {{ actionLabels[lastDeniedTransport.action] }}:</b>
-                        “{{ lastDeniedTransport.reviewReason }}” — {{ lastDeniedTransport.reviewedBy }}
+                        <b
+                            >{{ roleLabels[lastDeniedTransport.requiredRole] }}
+                            denied
+                            {{ actionLabels[lastDeniedTransport.action] }}:</b
+                        >
+                        “{{ lastDeniedTransport.reviewReason }}” —
+                        {{ lastDeniedTransport.reviewedBy }}
                     </div>
 
-                    <p v-if="batch.retrospective" class="text-xs text-muted-foreground">
+                    <p
+                        v-if="batch.retrospective"
+                        class="text-xs text-muted-foreground"
+                    >
                         Retrospective: charge time has passed.
                     </p>
-                    <p v-else-if="role !== 'operator'" class="text-xs text-muted-foreground">
+                    <p
+                        v-else-if="role !== 'operator'"
+                        class="text-xs text-muted-foreground"
+                    >
                         Waiting for operator transport selection.
                     </p>
                     <div v-else class="grid grid-cols-1 gap-2 sm:grid-cols-2">
                         <!-- EXPEDITE -->
                         <div
-                            class="flex flex-col rounded-lg border p-2 text-xs gap-1 bg-card"
+                            class="flex flex-col gap-1 rounded-lg border bg-card p-2 text-xs"
                             :class="!batch.expediteAllowed ? 'opacity-80' : ''"
                         >
                             <b class="text-sm">{{ actionLabels.EXPEDITE }}</b>
-                            <span class="text-muted-foreground">Faster transport slot</span>
+                            <span class="text-muted-foreground"
+                                >Faster transport slot</span
+                            >
                             <span
                                 v-if="!batch.expediteAllowed"
-                                class="text-[11px] text-amber-700 dark:text-amber-400 font-medium"
+                                class="text-[11px] font-medium text-amber-700 dark:text-amber-400"
                             >
                                 {{ batch.expediteBlockedReason }}
                             </span>
                             <span
                                 v-else-if="batch.materialHeld"
-                                class="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium"
+                                class="text-[11px] font-medium text-emerald-700 dark:text-emerald-400"
                             >
                                 Allowed: QA confirmed potentially usable
                             </span>
-                            <span v-else class="text-[11px] text-muted-foreground">Needs Logistics review</span>
+                            <span
+                                v-else
+                                class="text-[11px] text-muted-foreground"
+                                >Needs Logistics review</span
+                            >
 
                             <div class="mt-auto pt-2">
                                 <Button
                                     size="sm"
                                     class="w-full"
                                     variant="outline"
-                                    :disabled="!canChooseTransport || !batch.expediteAllowed"
+                                    :disabled="
+                                        !canChooseTransport ||
+                                        !batch.expediteAllowed
+                                    "
                                     @click="emit('choose', 'EXPEDITE')"
                                 >
                                     Expedite
@@ -424,30 +533,39 @@ const canReviewTransport = computed(
 
                         <!-- REROUTE -->
                         <div
-                            class="flex flex-col rounded-lg border p-2 text-xs gap-1 bg-card"
+                            class="flex flex-col gap-1 rounded-lg border bg-card p-2 text-xs"
                             :class="!batch.rerouteAllowed ? 'opacity-80' : ''"
                         >
                             <b class="text-sm">{{ actionLabels.REROUTE }}</b>
-                            <span class="text-muted-foreground">Alternative route</span>
+                            <span class="text-muted-foreground"
+                                >Alternative route</span
+                            >
                             <span
                                 v-if="!batch.rerouteAllowed"
-                                class="text-[11px] text-amber-700 dark:text-amber-400 font-medium"
+                                class="text-[11px] font-medium text-amber-700 dark:text-amber-400"
                             >
                                 {{ batch.rerouteBlockedReason }}
                             </span>
                             <span
                                 v-else-if="batch.materialHeld"
-                                class="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium"
+                                class="text-[11px] font-medium text-emerald-700 dark:text-emerald-400"
                             >
                                 Allowed: QA confirmed potentially usable
                             </span>
-                            <span v-else class="text-[11px] text-muted-foreground">Needs Logistics review</span>
+                            <span
+                                v-else
+                                class="text-[11px] text-muted-foreground"
+                                >Needs Logistics review</span
+                            >
                             <div class="mt-auto pt-2">
                                 <Button
                                     size="sm"
                                     class="w-full"
                                     variant="outline"
-                                    :disabled="!canChooseTransport || !batch.rerouteAllowed"
+                                    :disabled="
+                                        !canChooseTransport ||
+                                        !batch.rerouteAllowed
+                                    "
                                     @click="emit('choose', 'REROUTE')"
                                 >
                                     Reroute

@@ -17,10 +17,6 @@ Artisan::command('demo:reset', function (ResetBatchDecisions $reset): void {
 
 Artisan::command('batches:brief', function (PrepareBatchBriefings $prepare): void {
     foreach ($prepare->handle() as $batchId => $source) {
-        $this->line(sprintf('%s: %s', $batchId, match ($source) {
-            'llm' => 'AI briefing',
-            'codex' => 'Codex briefing',
-            default => 'template (AI unavailable)',
-        }));
+        $this->line(sprintf('%s: %s', $batchId, $source->label()));
     }
 })->purpose('Generate and store batch briefings before a demo');

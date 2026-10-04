@@ -38,7 +38,8 @@ final class BriefBatchWithCodex
             ];
 
             if (filled(config('briefing.codex.model'))) {
-                array_push($command, '--model', (string) config('briefing.codex.model'));
+                $command[] = '--model';
+                $command[] = (string) config('briefing.codex.model');
             }
 
             $command[] = '-';
