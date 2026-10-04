@@ -10,48 +10,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
 
-const HOT_BATCH = 'operations-demo-v1-batch-002';
-
 beforeEach(function (): void {
     $this->withoutVite();
     Http::preventStrayRequests();
 });
-
-/**
- * Serve the team's stored demo assessments and operations from a fake engine.
- */
-function fakeEngine(): void
-{
-    $assessments = json_decode((string) file_get_contents(base_path('../output/batch-assessments-demo.json')), true, 512, JSON_THROW_ON_ERROR);
-    $operations = json_decode((string) file_get_contents(base_path('../output/operations-demo.json')), true, 512, JSON_THROW_ON_ERROR);
-
-    Http::fake(function (Illuminate\Http\Client\Request $request) use ($assessments, $operations) {
-        $path = parse_url($request->url(), PHP_URL_PATH);
-
-        if ($path === '/api/integration/batch-assessments') {
-            return Http::response($assessments);
-        }
-
-        if ($path === '/api/integration/operations') {
-            return Http::response([$operations]);
-        }
-
-        if (preg_match('#^/api/integration/batches/([^/]+)/assessments/latest$#', (string) $path, $match) === 1) {
-            $record = collect($assessments)->firstWhere('batch_id', $match[1]);
-
-            return $record === null ? Http::response([], 404) : Http::response($record);
-        }
-
-        return Http::response([], 404);
-    });
-}
-
-function hotAssessmentId(): string
-{
-    $assessments = json_decode((string) file_get_contents(base_path('../output/batch-assessments-demo.json')), true, 512, JSON_THROW_ON_ERROR);
-
-    return collect($assessments)->firstWhere('batch_id', HOT_BATCH)['assessment_id'];
-}
 
 function submitAs(UserRole $role, string $action, array $payload = []): Illuminate\Testing\TestResponse
 {

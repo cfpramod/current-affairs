@@ -129,20 +129,6 @@ export type ShipmentConsole = {
     log: ShipmentDecision[];
 };
 
-export type ShipmentOverview = {
-    open: { open: number; needsYou: number; suspended: number; atRisk: number };
-    recent: {
-        days: number;
-        decided: number;
-        overrides: number;
-        onTime: number;
-        withinBudget: number;
-    };
-    decisionsByAction: Record<ActionKey, number>;
-    needsYou: ShipmentListItem[];
-    nextCharges: ShipmentListItem[];
-};
-
 export type BatchDecisionStatus = 'pending' | 'accepted' | 'denied';
 
 export type BatchDecision = {
@@ -210,4 +196,19 @@ export type BatchReviewItem = {
     submittedReason: string;
     submittedAt: string;
     chargeAt: string | null;
+    status: BatchDecisionStatus;
+    reviewReason: string | null;
+    nextAction: string | null;
+    reviewedAt: string | null;
+};
+
+export type RoleOverview = {
+    role: Role;
+    engineUnavailable: boolean;
+    needsDecision: BatchListItem[];
+    waitingOnOthers: BatchListItem[];
+    nextCharges: BatchListItem[];
+    reviewQueue: BatchReviewItem[];
+    watchlist: BatchListItem[];
+    recentlyReviewed: BatchReviewItem[];
 };

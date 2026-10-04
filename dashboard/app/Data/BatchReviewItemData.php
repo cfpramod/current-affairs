@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use App\Actions\Batches\ListBatches;
+use App\Enums\BatchDecisionStatus;
 use App\Enums\ShipmentAction;
 use App\Models\BatchDecision;
 use Spatie\LaravelData\Data;
@@ -21,6 +22,10 @@ final class BatchReviewItemData extends Data
         public string $submittedReason,
         public string $submittedAt,
         public ?string $chargeAt,
+        public BatchDecisionStatus $status,
+        public ?string $reviewReason,
+        public ?string $nextAction,
+        public ?string $reviewedAt,
     ) {}
 
     public static function fromModel(BatchDecision $decision): self
@@ -37,6 +42,10 @@ final class BatchReviewItemData extends Data
             submittedReason: $decision->submitted_reason,
             submittedAt: $decision->submitted_at->toIso8601String(),
             chargeAt: is_string($chargeAt) ? $chargeAt : null,
+            status: $decision->status,
+            reviewReason: $decision->review_reason,
+            nextAction: $decision->next_action,
+            reviewedAt: $decision->reviewed_at?->toIso8601String(),
         );
     }
 }

@@ -1,28 +1,13 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import {
-    actionLabels,
-    formatDateTime,
-    roleLabels,
-} from '@/components/console/format';
+import { roleLabels } from '@/components/console/format';
+import OverviewBatchList from '@/components/overview/OverviewBatchList.vue';
+import OverviewReviewList from '@/components/overview/OverviewReviewList.vue';
 import { dashboard } from '@/routes';
-import { show as showBatch } from '@/routes/batches';
-import { index, show } from '@/routes/shipments';
-import type {
-    ActionKey,
-    BatchReviewItem,
-    ShipmentListItem,
-    ShipmentOverview,
-} from '@/types/console';
+import type { RoleOverview } from '@/types/console';
 
-const props = defineProps<{
-    overview: ShipmentOverview;
-    batchReviews: BatchReviewItem[];
-}>();
-
-const page = usePage();
-const role = computed(() => page.props.auth.user.role);
+defineProps<{ overview: RoleOverview }>();
 
 defineOptions({
     layout: {
@@ -30,259 +15,79 @@ defineOptions({
     },
 });
 
-const share = (count: number) =>
-    props.overview.recent.decided === 0
-        ? '—'
-        : `${Math.round((count / props.overview.recent.decided) * 100)}%`;
-
-const openTiles = computed(() => [
-    {
-        label: 'Need your approval',
-        value: props.overview.open.needsYou,
-        emphasis: props.overview.open.needsYou > 0,
-    },
-    { label: 'Open shipments', value: props.overview.open.open },
-    { label: 'At risk', value: props.overview.open.atRisk },
-    { label: 'Suspended', value: props.overview.open.suspended },
-]);
-
-const recentTiles = computed(() => [
-    { label: 'Decided', value: String(props.overview.recent.decided) },
-    { label: 'Arrived on time', value: share(props.overview.recent.onTime) },
-    {
-        label: 'Within temperature budget',
-        value: share(props.overview.recent.withinBudget),
-    },
-    { label: 'Overrides', value: String(props.overview.recent.overrides) },
-]);
-
-const actionBars = computed(() => {
-    const entries = Object.entries(props.overview.decisionsByAction) as [
-        ActionKey,
-        number,
-    ][];
-    const max = Math.max(1, ...entries.map(([, count]) => count));
-
-    return entries.map(([action, count]) => ({
-        action,
-        count,
-        width: `${(count / max) * 100}%`,
-    }));
-});
-
-function nextLabel(item: ShipmentListItem): string {
-    return item.recommendedAction ? actionLabels[item.recommendedAction] : '—';
-}
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 </script>
 
 <template>
-    <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 p-4 md:p-6">
+    <div class="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-5 p-4 md:p-6">
         <Head title="Overview" />
 
         <div>
-            <h1 class="text-2xl font-bold tracking-tight">Overview</h1>
+            <h1 class="text-2xl font-bold tracking-tight">
+                {{ user.name }}
+            </h1>
             <p class="text-sm text-muted-foreground">
-                All shipments heading to R2 and recent decisions.
+                {{ roleLabels[overview.role] }} overview
             </p>
         </div>
 
-        <section
-            v-if="role !== 'operator'"
-            class="flex flex-col gap-3 rounded-xl border-2 p-5"
-            :class="
-                batchReviews.length > 0 ? 'border-sky-600/60' : 'border-border'
-            "
+        <div
+            v-if="overview.engineUnavailable"
+            class="rounded-xl border border-amber-500/60 p-4 text-sm"
         >
-            <div class="flex items-baseline justify-between gap-2">
-                <h2 class="text-lg font-semibold">
-                    Batch requests waiting for {{ roleLabels[role] }} review
-                </h2>
-                <span
-                    class="text-2xl font-bold tabular-nums"
-                    :class="
-                        batchReviews.length > 0
-                            ? 'text-sky-700 dark:text-sky-400'
-                            : 'text-muted-foreground'
-                    "
-                >
-                    {{ batchReviews.length }}
-                </span>
-            </div>
-            <p
-                v-if="batchReviews.length === 0"
-                class="text-sm text-muted-foreground"
-            >
-                Nothing waiting for you.
-            </p>
-            <ul v-else class="flex flex-col divide-y">
-                <li v-for="item in batchReviews" :key="item.id">
-                    <Link
-                        :href="showBatch(item.batchId)"
-                        class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2 text-sm hover:text-sky-700 dark:hover:text-sky-400"
-                    >
-                        <span>
-                            <b>{{ item.label }}</b> ·
-                            {{ actionLabels[item.action] }} requested by
-                            {{ item.submittedBy }}
-                            <span
-                                v-if="item.modelAction !== item.action"
-                                class="text-xs text-amber-700 dark:text-amber-400"
-                            >
-                                ({{
-                                    item.modelAction
-                                        ? 'overrides model'
-                                        : 'no model action'
-                                }})
-                            </span>
-                            <span class="block text-muted-foreground"
-                                >“{{ item.submittedReason }}”</span
-                            >
-                        </span>
-                        <span class="text-muted-foreground">
-                            <template v-if="item.chargeAt"
-                                >charge
-                                {{
-                                    formatDateTime(
-                                        item.chargeAt,
-                                        'Europe/Zurich',
-                                    )
-                                }}
-                                ·
-                            </template>
-                            requested
-                            {{
-                                formatDateTime(
-                                    item.submittedAt,
-                                    'Europe/Zurich',
-                                )
-                            }}
-                        </span>
-                    </Link>
-                </li>
-            </ul>
-        </section>
-
-        <section class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <div
-                v-for="tile in openTiles"
-                :key="tile.label"
-                class="rounded-xl border bg-card p-4"
-                :class="tile.emphasis ? 'border-sky-600/60' : ''"
-            >
-                <div class="text-sm text-muted-foreground">
-                    {{ tile.label }}
-                </div>
-                <div
-                    class="text-3xl font-bold tabular-nums"
-                    :class="
-                        tile.emphasis ? 'text-sky-700 dark:text-sky-400' : ''
-                    "
-                >
-                    {{ tile.value }}
-                </div>
-            </div>
-        </section>
-
-        <div class="grid gap-6 lg:grid-cols-2">
-            <section class="flex flex-col gap-3 rounded-xl border bg-card p-5">
-                <h2 class="text-lg font-semibold">Needs your approval</h2>
-                <p
-                    v-if="overview.needsYou.length === 0"
-                    class="text-sm text-muted-foreground"
-                >
-                    Nothing waiting for you.
-                </p>
-                <ul v-else class="flex flex-col divide-y">
-                    <li v-for="item in overview.needsYou" :key="item.id">
-                        <Link
-                            :href="show(item.id)"
-                            class="flex items-baseline justify-between gap-3 py-2 text-sm hover:text-sky-700 dark:hover:text-sky-400"
-                        >
-                            <span>
-                                <span class="font-mono">{{ item.lot }}</span>
-                                · {{ nextLabel(item) }}
-                            </span>
-                            <span class="text-muted-foreground">{{
-                                formatDateTime(item.chargeAt, item.timezone)
-                            }}</span>
-                        </Link>
-                    </li>
-                </ul>
-            </section>
-
-            <section class="flex flex-col gap-3 rounded-xl border bg-card p-5">
-                <div class="flex items-baseline justify-between">
-                    <h2 class="text-lg font-semibold">Next charges</h2>
-                    <Link
-                        :href="index()"
-                        class="text-sm text-sky-700 hover:underline dark:text-sky-400"
-                        >All shipments</Link
-                    >
-                </div>
-                <ul class="flex flex-col divide-y">
-                    <li v-for="item in overview.nextCharges" :key="item.id">
-                        <Link
-                            :href="show(item.id)"
-                            class="flex items-baseline justify-between gap-3 py-2 text-sm hover:text-sky-700 dark:hover:text-sky-400"
-                        >
-                            <span>
-                                <span class="font-mono">{{ item.lot }}</span>
-                                · {{ nextLabel(item) }}
-                                <span
-                                    v-if="item.approverRole"
-                                    class="text-xs text-muted-foreground"
-                                >
-                                    ({{ roleLabels[item.approverRole] }})
-                                </span>
-                            </span>
-                            <span class="text-muted-foreground">{{
-                                formatDateTime(item.chargeAt, item.timezone)
-                            }}</span>
-                        </Link>
-                    </li>
-                </ul>
-            </section>
+            The data engine is unavailable, so batch evidence can't be shown.
+            Start it with <code>bash scripts/demo.sh</code>.
         </div>
 
-        <section class="flex flex-col gap-4 rounded-xl border bg-card p-5">
-            <h2 class="text-lg font-semibold">
-                Last {{ overview.recent.days }} days
-            </h2>
-            <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                <div v-for="tile in recentTiles" :key="tile.label">
-                    <div class="text-sm text-muted-foreground">
-                        {{ tile.label }}
-                    </div>
-                    <div class="text-2xl font-bold tabular-nums">
-                        {{ tile.value }}
-                    </div>
-                </div>
+        <template v-if="overview.role === 'operator'">
+            <OverviewBatchList
+                title="Needs your decision"
+                empty="Every upcoming batch has a decision."
+                :items="overview.needsDecision"
+                emphasis
+            />
+            <div class="grid gap-5 lg:grid-cols-2">
+                <OverviewBatchList
+                    title="Waiting on others"
+                    empty="No requests waiting for QA or logistics."
+                    :items="overview.waitingOnOthers"
+                />
+                <OverviewBatchList
+                    title="Next charges"
+                    empty="No upcoming batches."
+                    :items="overview.nextCharges"
+                />
             </div>
+        </template>
 
-            <div>
-                <h3 class="mb-2 text-sm font-medium">Decisions by action</h3>
-                <ul class="flex flex-col gap-2">
-                    <li
-                        v-for="bar in actionBars"
-                        :key="bar.action"
-                        class="grid grid-cols-[8rem_1fr_2rem] items-center gap-3 text-sm"
-                        :title="`${actionLabels[bar.action]}: ${bar.count}`"
-                    >
-                        <span class="text-muted-foreground">{{
-                            actionLabels[bar.action]
-                        }}</span>
-                        <span class="h-3 rounded-r bg-muted">
-                            <span
-                                class="block h-full rounded-r bg-sky-600 dark:bg-sky-500"
-                                :style="{ width: bar.width }"
-                            />
-                        </span>
-                        <span class="text-right tabular-nums">{{
-                            bar.count
-                        }}</span>
-                    </li>
-                </ul>
+        <template v-else>
+            <OverviewReviewList
+                :title="`Waiting for your review`"
+                empty="Nothing waiting for you."
+                :items="overview.reviewQueue"
+                emphasis
+            />
+            <div class="grid gap-5 lg:grid-cols-2">
+                <OverviewBatchList
+                    :title="
+                        overview.role === 'qa'
+                            ? 'Temperature watchlist'
+                            : 'Incoming at risk'
+                    "
+                    :empty="
+                        overview.role === 'qa'
+                            ? 'No upcoming batch has a temperature concern.'
+                            : 'No upcoming batch depends on a late shipment.'
+                    "
+                    :items="overview.watchlist"
+                />
+                <OverviewReviewList
+                    title="Recently reviewed by you"
+                    empty="You haven't reviewed a request yet."
+                    :items="overview.recentlyReviewed"
+                />
             </div>
-        </section>
+        </template>
     </div>
 </template>
