@@ -199,3 +199,15 @@ export type BatchConsole = Omit<BatchListItem, 'decision'> & {
     decisions: BatchDecision[];
     activeDecision: BatchDecision | null;
 };
+
+export type BatchReviewItem = {
+    id: number;
+    batchId: string;
+    label: string;
+    action: ActionKey;
+    modelAction: ActionKey | null;
+    submittedBy: string;
+    submittedReason: string;
+    submittedAt: string;
+    chargeAt: string | null;
+};

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import {
     actionLabels,
@@ -7,14 +7,22 @@ import {
     roleLabels,
 } from '@/components/console/format';
 import { dashboard } from '@/routes';
+import { show as showBatch } from '@/routes/batches';
 import { index, show } from '@/routes/shipments';
 import type {
     ActionKey,
+    BatchReviewItem,
     ShipmentListItem,
     ShipmentOverview,
 } from '@/types/console';
 
-const props = defineProps<{ overview: ShipmentOverview }>();
+const props = defineProps<{
+    overview: ShipmentOverview;
+    batchReviews: BatchReviewItem[];
+}>();
+
+const page = usePage();
+const role = computed(() => page.props.auth.user.role);
 
 defineOptions({
     layout: {
@@ -77,6 +85,82 @@ function nextLabel(item: ShipmentListItem): string {
                 All shipments heading to R2 and recent decisions.
             </p>
         </div>
+
+        <section
+            v-if="role !== 'operator'"
+            class="flex flex-col gap-3 rounded-xl border-2 p-5"
+            :class="
+                batchReviews.length > 0 ? 'border-sky-600/60' : 'border-border'
+            "
+        >
+            <div class="flex items-baseline justify-between gap-2">
+                <h2 class="text-lg font-semibold">
+                    Batch requests waiting for {{ roleLabels[role] }} review
+                </h2>
+                <span
+                    class="text-2xl font-bold tabular-nums"
+                    :class="
+                        batchReviews.length > 0
+                            ? 'text-sky-700 dark:text-sky-400'
+                            : 'text-muted-foreground'
+                    "
+                >
+                    {{ batchReviews.length }}
+                </span>
+            </div>
+            <p
+                v-if="batchReviews.length === 0"
+                class="text-sm text-muted-foreground"
+            >
+                Nothing waiting for you.
+            </p>
+            <ul v-else class="flex flex-col divide-y">
+                <li v-for="item in batchReviews" :key="item.id">
+                    <Link
+                        :href="showBatch(item.batchId)"
+                        class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-2 text-sm hover:text-sky-700 dark:hover:text-sky-400"
+                    >
+                        <span>
+                            <b>{{ item.label }}</b> ·
+                            {{ actionLabels[item.action] }} requested by
+                            {{ item.submittedBy }}
+                            <span
+                                v-if="item.modelAction !== item.action"
+                                class="text-xs text-amber-700 dark:text-amber-400"
+                            >
+                                ({{
+                                    item.modelAction
+                                        ? 'overrides model'
+                                        : 'no model action'
+                                }})
+                            </span>
+                            <span class="block text-muted-foreground"
+                                >“{{ item.submittedReason }}”</span
+                            >
+                        </span>
+                        <span class="text-muted-foreground">
+                            <template v-if="item.chargeAt"
+                                >charge
+                                {{
+                                    formatDateTime(
+                                        item.chargeAt,
+                                        'Europe/Zurich',
+                                    )
+                                }}
+                                ·
+                            </template>
+                            requested
+                            {{
+                                formatDateTime(
+                                    item.submittedAt,
+                                    'Europe/Zurich',
+                                )
+                            }}
+                        </span>
+                    </Link>
+                </li>
+            </ul>
+        </section>
 
         <section class="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <div
