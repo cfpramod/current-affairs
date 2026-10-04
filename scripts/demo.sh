@@ -111,7 +111,7 @@ grep -q '^DATA_ENGINE_URL=' .env || printf '\nDATA_ENGINE_URL=http://127.0.0.1:%
 if grep -q '^SMARTFLOW_DEMO_AUTOFILL=' .env; then
     sed -i.bak 's/^SMARTFLOW_DEMO_AUTOFILL=.*/SMARTFLOW_DEMO_AUTOFILL=true/' .env && rm -f .env.bak
 else
-    printf 'SMARTFLOW_DEMO_AUTOFILL=true\n' >> .env
+    printf '\nSMARTFLOW_DEMO_AUTOFILL=true\n' >> .env
 fi
 
 if [ ! -d vendor ]; then
@@ -155,8 +155,32 @@ fi
 # --- Serve -------------------------------------------------------------------
 cd "$ROOT"
 PIDS=()
-cleanup() { [ "${#PIDS[@]}" -gt 0 ] && kill "${PIDS[@]}" 2>/dev/null || true; }
-trap cleanup EXIT INT TERM
+# pixi and artisan serve start child processes; stop the whole tree so no
+# orphaned engine keeps its port. Children first, before they are reparented.
+kill_tree() {
+    local child
+    for child in $(pgrep -P "$1" 2>/dev/null); do kill_tree "$child"; done
+    kill "$1" 2>/dev/null || true
+}
+cleanup() {
+    local pid
+    for pid in ${PIDS[@]+"${PIDS[@]}"}; do kill_tree "$pid"; done
+}
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+port_in_use() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
+
+APP_URL=""
+if command -v herd >/dev/null 2>&1 && herd links 2>/dev/null | grep -q "$APP"; then
+    APP_URL="$(herd links 2>/dev/null | grep "$APP" | grep -o 'https\?://[^ |]*' | head -1)"
+fi
+if [ -z "$APP_URL" ] && port_in_use 8000; then
+    echo "Port 8000 is already in use. Stop the other server (lsof -i :8000 shows it), then run this again." >&2
+    exit 1
+fi
 
 if curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments" >/dev/null 2>&1; then
     if ! curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments?dataset_id=$DATASET_ID" | "${PY[@]}" -c 'import json,sys; sys.exit(0 if json.load(sys.stdin) else 1)'; then
@@ -167,20 +191,29 @@ if curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments" >/
 else
     step "Starting engine API on port $ENGINE_PORT"
     "${PY[@]}" -m baselhack.integration serve --port "$ENGINE_PORT" --database "$SELECTED_DB" &
-    PIDS+=($!)
+    ENGINE_PID=$!
+    PIDS+=("$ENGINE_PID")
+    ENGINE_UP=0
     for _ in $(seq 1 30); do
-        curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments" >/dev/null 2>&1 && break
+        if curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments" >/dev/null 2>&1; then
+            ENGINE_UP=1
+            break
+        fi
+        kill -0 "$ENGINE_PID" 2>/dev/null || break
         sleep 0.5
     done
+    if [ "$ENGINE_UP" = 0 ]; then
+        if kill -0 "$ENGINE_PID" 2>/dev/null; then
+            echo "The engine API did not answer on port $ENGINE_PORT within 15 seconds. Check the output above, then run this again." >&2
+        else
+            echo "The engine API stopped while starting; see the error above (is port $ENGINE_PORT taken?)." >&2
+        fi
+        exit 1
+    fi
 fi
 
 step "Preparing cached batch briefings (API, then local Codex, then template)"
 (cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" SMARTFLOW_CODEX_BRIEFINGS=true php artisan batches:brief) || echo "Pages will show the evidence template until briefings are prepared (php artisan batches:brief)."
-
-APP_URL=""
-if command -v herd >/dev/null 2>&1 && herd links 2>/dev/null | grep -q "$APP"; then
-    APP_URL="$(herd links 2>/dev/null | grep "$APP" | grep -o 'https\?://[^ |]*' | head -1)"
-fi
 
 cat <<EOF
 
