@@ -131,11 +131,19 @@ export type ShipmentConsole = {
 
 export type BatchDecisionStatus = 'pending' | 'accepted' | 'denied';
 
+export type DecisionLane = 'material' | 'transport';
+
+export type QaProspect = 'unknown' | 'potentially_usable' | 'rejected';
+
 export type BatchDecision = {
     id: number;
     assessmentId: string;
     modelAction: ActionKey | null;
     action: ActionKey;
+    lane: DecisionLane;
+    shipmentId?: string | null;
+    lotId?: string | null;
+    qaProspect?: QaProspect | null;
     requiredRole: Role;
     status: BatchDecisionStatus;
     submittedBy: string;
@@ -178,7 +186,7 @@ export type BatchBriefing = {
     headline: string;
     summary: string;
     qaNote: string | null;
-    source: 'llm' | 'template';
+    source: 'llm' | 'codex' | 'template';
     model: string | null;
 };
 
@@ -193,6 +201,16 @@ export type BatchConsole = Omit<BatchListItem, 'decision'> & {
     assessment: StoredBatchAssessment;
     decisions: BatchDecision[];
     activeDecision: BatchDecision | null;
+    activeMaterialDecision: BatchDecision | null;
+    activeTransportDecision: BatchDecision | null;
+    qaProspect: QaProspect | null;
+    materialHeld: boolean;
+    expediteAllowed: boolean;
+    expediteBlockedReason: string | null;
+    bufferAllowed: boolean;
+    bufferBlockedReason: string | null;
+    runAllowed: boolean;
+    runBlockedReason: string | null;
 };
 
 export type BatchReviewItem = {

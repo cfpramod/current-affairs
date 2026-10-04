@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $assessment_id
  * @property string $batch_id
  * @property string $model
+ * @property string $source
  * @property string $headline
  * @property string $summary
  * @property ?string $qa_note

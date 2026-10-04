@@ -9,7 +9,7 @@ use Spatie\LaravelData\Data;
 final class BatchBriefingData extends Data
 {
     /**
-     * @param  'llm'|'template'  $source
+     * @param  'llm'|'codex'|'template'  $source
      */
     public function __construct(
         public string $headline,

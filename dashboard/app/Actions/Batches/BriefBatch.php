@@ -16,11 +16,13 @@ use Throwable;
  * A plain-language briefing for one stored batch assessment. The LLM only
  * words the facts; it never decides. Assessments are immutable, so an LLM
  * briefing is generated once and reused. Without an API key, or if the
- * provider fails, a template built from the same facts is returned.
+ * provider fails, local Codex is tried before the evidence template.
  */
 final class BriefBatch
 {
     private const string TIMEZONE = 'Europe/Zurich';
+
+    public function __construct(private readonly BriefBatchWithCodex $codex) {}
 
     /**
      * @param  array<string, mixed>  $assessment
@@ -30,7 +32,7 @@ final class BriefBatch
         $stored = BatchBriefing::query()->where('assessment_id', $assessment['assessment_id'])->first();
 
         if ($stored !== null) {
-            return new BatchBriefingData($stored->headline, $stored->summary, $stored->qa_note, 'llm', $stored->model);
+            return new BatchBriefingData($stored->headline, $stored->summary, $stored->qa_note, $stored->source, $stored->model);
         }
 
         $facts = $this->facts($assessment);
@@ -41,6 +43,12 @@ final class BriefBatch
             if ($briefing instanceof BatchBriefingData) {
                 return $briefing;
             }
+        }
+
+        $output = $this->codex->handle($facts);
+
+        if ($output !== null) {
+            return $this->store($assessment, $output, 'codex', (string) (config('briefing.codex.model') ?: 'Codex CLI'));
         }
 
         return $this->template($facts);
@@ -75,24 +83,33 @@ final class BriefBatch
                 return null;
             }
 
-            BatchBriefing::query()->create([
-                'assessment_id' => $assessment['assessment_id'],
-                'batch_id' => $assessment['batch_id'],
-                'model' => $model,
-                'headline' => mb_substr($headline, 0, 255),
-                'summary' => $summary,
-                'qa_note' => $qaNote,
-            ]);
-
-            return new BatchBriefingData(mb_substr($headline, 0, 255), $summary, $qaNote, 'llm', $model);
+            return $this->store($assessment, ['headline' => $headline, 'summary' => $summary, 'qa_note' => $qaNote], 'llm', $model);
         } catch (Throwable $throwable) {
-            Log::warning('Batch briefing fell back to the template.', [
+            Log::warning('API batch briefing unavailable; trying local Codex.', [
                 'assessment_id' => $assessment['assessment_id'],
                 'error' => $throwable->getMessage(),
             ]);
 
             return null;
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $assessment
+     * @param  array{headline: string, summary: string, qa_note: ?string}  $output
+     */
+    private function store(array $assessment, array $output, string $source, string $model): BatchBriefingData
+    {
+        $stored = BatchBriefing::query()->firstOrCreate(['assessment_id' => $assessment['assessment_id']], [
+            'batch_id' => $assessment['batch_id'],
+            'source' => $source,
+            'model' => $model,
+            'headline' => mb_substr(mb_trim($output['headline']), 0, 255),
+            'summary' => mb_trim($output['summary']),
+            'qa_note' => filled($output['qa_note']) ? mb_trim($output['qa_note']) : null,
+        ]);
+
+        return new BatchBriefingData($stored->headline, $stored->summary, $stored->qa_note, $stored->source, $stored->model);
     }
 
     /**
@@ -135,6 +152,7 @@ final class BriefBatch
                 'range_c' => $evidence['range_c'],
                 'last_reading_c' => $evidence['last_product_c'] === null ? null : round((float) $evidence['last_product_c'], 1),
                 'readings' => $evidence['reading_count'],
+                'complete_journey' => $evidence['complete_journey'],
             ], $assessment['product_temperature']),
             'model_recommendation' => [
                 'action' => $assessment['recommendation']['action'],
@@ -180,7 +198,7 @@ final class BriefBatch
         return new BatchBriefingData(
             headline: $headline,
             summary: implode(' ', $sentences),
-            qaNote: $exceeded !== [] ? 'QA must review the temperature evidence before this lot is used; release stays a separate human decision.' : null,
+            qaNote: $exceeded !== [] ? 'QA must review the temperature evidence before this lot is used; quarantine hold and transport logistics remain separate lanes, and release stays a separate human decision.' : null,
             source: 'template',
             model: null,
         );

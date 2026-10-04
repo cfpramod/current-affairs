@@ -7,6 +7,7 @@ namespace App\Actions\Batches;
 use App\Data\BatchDecisionData;
 use App\Data\BatchListItemData;
 use App\Data\BatchRecommendationData;
+use App\Enums\BatchDecisionStatus;
 use App\Exceptions\DataEngineUnavailable;
 use App\Integrations\DataEngine;
 use App\Models\BatchDecision;
@@ -42,14 +43,16 @@ final readonly class ListBatches
             ->with(['submitter', 'reviewer'])
             ->whereIn('batch_id', $latest->pluck('batch_id'))
             ->latest('submitted_at')
-            ->get()
-            ->unique('batch_id')
-            ->keyBy('batch_id');
+            ->get();
+        $decisionsByBatch = $decisions->groupBy('batch_id');
 
         return array_values($latest
-            ->map(function (array $assessment) use ($reactors, $decisions): BatchListItemData {
+            ->map(function (array $assessment) use ($reactors, $decisionsByBatch): BatchListItemData {
                 $chargeAt = (string) $assessment['production_readiness']['planned_charge_at'];
-                $decision = $decisions->get($assessment['batch_id']);
+                $batchDecisions = $decisionsByBatch->get($assessment['batch_id'], collect());
+                $decision = $batchDecisions->first(fn (BatchDecision $d): bool => $d->status === BatchDecisionStatus::Pending)
+                    ?? $batchDecisions->first(fn (BatchDecision $d): bool => $d->status === BatchDecisionStatus::Accepted)
+                    ?? $batchDecisions->first();
 
                 return new BatchListItemData(
                     batchId: $assessment['batch_id'],

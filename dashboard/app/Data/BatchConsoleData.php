@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data;
 
+use App\Enums\QaProspect;
 use Spatie\LaravelData\Data;
 
 /**
@@ -41,5 +42,15 @@ final class BatchConsoleData extends Data
         public array $decisions,
         public ?BatchDecisionData $activeDecision,
         public BatchBriefingData $briefing,
+        public ?BatchDecisionData $activeMaterialDecision = null,
+        public ?BatchDecisionData $activeTransportDecision = null,
+        public ?QaProspect $qaProspect = null,
+        public bool $materialHeld = false,
+        public bool $expediteAllowed = false,
+        public ?string $expediteBlockedReason = null,
+        public bool $bufferAllowed = true,
+        public ?string $bufferBlockedReason = null,
+        public bool $runAllowed = true,
+        public ?string $runBlockedReason = null,
     ) {}
 }

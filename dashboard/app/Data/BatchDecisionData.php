@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Data;
 
 use App\Enums\BatchDecisionStatus;
+use App\Enums\DecisionLane;
+use App\Enums\QaProspect;
 use App\Enums\ShipmentAction;
 use App\Enums\UserRole;
 use App\Models\BatchDecision;
@@ -27,6 +29,10 @@ final class BatchDecisionData extends Data
         public ?string $nextAction,
         public bool $responsibilityConfirmed,
         public ?string $reviewedAt,
+        public DecisionLane $lane,
+        public ?string $shipmentId = null,
+        public ?string $lotId = null,
+        public ?QaProspect $qaProspect = null,
     ) {}
 
     public static function fromModel(BatchDecision $decision): self
@@ -46,6 +52,10 @@ final class BatchDecisionData extends Data
             nextAction: $decision->next_action,
             responsibilityConfirmed: $decision->responsibility_confirmed,
             reviewedAt: $decision->reviewed_at?->toIso8601String(),
+            lane: $decision->lane ?? $decision->action->lane(),
+            shipmentId: $decision->shipment_id,
+            lotId: $decision->lot_id,
+            qaProspect: $decision->qa_prospect,
         );
     }
 }

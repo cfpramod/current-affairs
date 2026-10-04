@@ -7,12 +7,83 @@ use App\Ai\BatchBriefingAgent;
 use App\Models\BatchBriefing;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Process;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Ai\Prompts\AgentPrompt;
 
 beforeEach(function (): void {
+    config(['briefing.codex.enabled' => false]);
     $this->withoutVite();
     Http::preventStrayRequests();
+});
+
+test('local Codex is used without an API key and its cached briefing is reused', function () {
+    config(['briefing.enabled' => false, 'briefing.codex.enabled' => true]);
+    BatchBriefingAgent::fake();
+    Process::fake(function ($process) {
+        $command = $process->command;
+        file_put_contents($command[array_search('--output-last-message', $command, true) + 1], json_encode([
+            'headline' => 'Stored temperature evidence needs QA review',
+            'summary' => 'The sampled lot exceeded its demonstration budget. The model supports no action.',
+            'qa_note' => 'QA must review; this is not release authorization.',
+        ]));
+
+        return Process::result();
+    });
+
+    $first = app(BriefBatch::class)->handle(hotAssessment());
+    config(['briefing.codex.enabled' => false]);
+    $second = app(BriefBatch::class)->handle(hotAssessment());
+
+    expect($first->source)->toBe('codex')
+        ->and($second->source)->toBe('codex')
+        ->and($second->headline)->toBe($first->headline)
+        ->and(BatchBriefing::query()->sole()->source)->toBe('codex');
+    BatchBriefingAgent::assertNeverPrompted();
+    Process::assertRan(fn ($process) => in_array('read-only', $process->command, true)
+        && str_contains($process->input, '"action":null')
+        && str_contains($process->input, '"complete_journey":false'));
+    Process::assertRanTimes(fn ($process) => is_array($process->command), 1);
+});
+
+test('API failure tries local Codex before the template', function () {
+    config(['briefing.enabled' => true, 'briefing.codex.enabled' => true]);
+    BatchBriefingAgent::fake(fn () => throw new RuntimeException('Provider unavailable'));
+    Process::fake(function ($process) {
+        $command = $process->command;
+        file_put_contents($command[array_search('--output-last-message', $command, true) + 1], '{"headline":"Stored facts","summary":"Human review is needed.","qa_note":null}');
+
+        return Process::result();
+    });
+
+    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe('codex');
+    Process::assertRanTimes(fn ($process) => is_array($process->command), 1);
+});
+
+test('unavailable or invalid Codex output falls back without caching', function (string $output, int $exitCode) {
+    config(['briefing.enabled' => false, 'briefing.codex.enabled' => true]);
+    Process::fake(function ($process) use ($output, $exitCode) {
+        $command = $process->command;
+        file_put_contents($command[array_search('--output-last-message', $command, true) + 1], $output);
+
+        return Process::result(exitCode: $exitCode);
+    });
+
+    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe('template')
+        ->and(BatchBriefing::query()->count())->toBe(0);
+})->with([
+    'CLI failed' => ['{}', 1],
+    'invalid JSON' => ['not JSON', 0],
+    'empty answer' => ['{"headline":"","summary":"","qa_note":null}', 0],
+    'invalid QA field' => ['{"headline":"Facts","summary":"Facts","qa_note":7}', 0],
+]);
+
+test('a timed out local Codex process falls back to the template', function () {
+    config(['briefing.enabled' => false, 'briefing.codex.enabled' => true]);
+    Process::fake(fn () => throw new RuntimeException('Process timed out'));
+
+    expect(app(BriefBatch::class)->handle(hotAssessment())->source)->toBe('template')
+        ->and(BatchBriefing::query()->count())->toBe(0);
 });
 
 /** @return array<string, mixed> */
@@ -37,7 +108,8 @@ test('without an API key the briefing is a template built from the stored eviden
 });
 
 test('with an API key the LLM words the facts once and the briefing is reused', function () {
-    config(['briefing.enabled' => true, 'briefing.model' => 'claude-opus-5-5']);
+    config(['briefing.enabled' => true, 'briefing.model' => 'claude-opus-5-5', 'briefing.codex.enabled' => true]);
+    Process::fake();
     BatchBriefingAgent::fake([[
         'headline' => 'Batch 002 should not charge: the lot overheated',
         'summary' => 'It spent 148 of 120 allowed minutes outside 2–8 °C.',
@@ -52,6 +124,7 @@ test('with an API key the LLM words the facts once and the briefing is reused', 
         ->and($second->headline)->toBe('Batch 002 should not charge: the lot overheated')
         ->and(BatchBriefing::query()->sole()->assessment_id)->toBe(hotAssessmentId());
     BatchBriefingAgent::assertPromptedTimes(1);
+    Process::assertNothingRan();
     BatchBriefingAgent::assertPrompted(fn (AgentPrompt $prompt): bool => $prompt->contains('"minutes_outside_range":148')
         && $prompt->contains('"action":null'));
 });

@@ -80,3 +80,41 @@ current examples use an ASSUMED fallback: correlated level/discharge trend
 penalties contribute their maximum rather than their sum. No official threshold
 is invented. Named normal/disruption/severe demos retain identical real evidence
 and vary only transparent simulated shipment state and assumption overrides.
+
+## Proposed integration: material hold and transport decisions
+
+Draft for product review, 2026-10-04; not implemented or an approved release policy.
+
+An excursion requiring a hold puts the affected lot into quarantine pending QA.
+Quarantine prevents production use; it does not by itself prohibit transport to
+controlled storage or testing. QA separately records a prospect assessment:
+unknown, potentially usable after specified checks, or rejected for production.
+This assessment is not a release decision. A small excursion or cooling back
+into range alone must not be interpreted as restored suitability.
+
+The console has distinct material-handling and transport sections. A lot can show
+“Quarantined — QA checks pending” and “Expedite to controlled storage — Logistics
+approval required” simultaneously. The operator requests actions, QA owns hold
+and prospect assessment, and Logistics owns route/expedite approval and next
+action. Changing transport must not clear the hold. Final QA release remains
+outside the prototype's automatic decision path.
+
+Recommended demo policy: a quarantined lot needs a recorded positive QA prospect
+assessment before approving additional expedite spend. An alternative is a
+separately authorized spend-at-risk decision while QA assessment is pending.
+This choice awaits the user. Rejected material offers no production-salvage
+expedite; controlled return, testing or disposal movements remain possible.
+
+Reuse the current immutable assessment, request/review history and role checks.
+Add a material-hold recommendation beside the transport recommendation in the
+canonical contract, and permit independent open decisions for material handling
+and transport. Bind both to the lot/shipment and exact assessment, since one
+shipment can supply several batches. UI and server enforce the same gates.
+Keep released replacement stock as a separate production option. AI briefings
+describe both states and never imply that transport approval releases the lot.
+
+Demo story: temperature deviation → quarantine → QA records potential usability
+after checks → Logistics accepts an expedite-to-storage request → operator sees
+both approvals with the material hold still active. A second QA-rejected case
+shows why production-salvage expedition is unavailable. QA judgements and any
+cost estimates in the demo are explicitly synthetic or human-entered.

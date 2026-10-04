@@ -6,6 +6,9 @@
 #   bash scripts/demo.sh --reset    also clear batch decisions (between rehearsals)
 #   bash scripts/demo.sh --fresh    rebuild engine databases and reseed the app
 #   bash scripts/demo.sh --setup    prepare only, don't serve
+#   bash scripts/demo.sh --case=hot       heat evidence and QA workflow
+#   bash scripts/demo.sh --case=buffer    computed safety-stock replay
+#   bash scripts/demo.sh --case=expedite  computed logistics replay (default)
 #
 # Engine: Python via pixi when installed, otherwise a uv venv in .runtime/venv.
 # App: served by Laravel Herd when it serves this folder, otherwise on port 8000.
@@ -13,12 +16,13 @@
 
 set -euo pipefail
 
-FRESH=0 RESET=0 SERVE=1
+FRESH=0 RESET=0 SERVE=1 DEMO_CASE=expedite
 for arg in "$@"; do
     case "$arg" in
         --fresh) FRESH=1 ;;
         --reset) RESET=1 ;;
         --setup) SERVE=0 ;;
+        --case=hot|--case=buffer|--case=expedite) DEMO_CASE="${arg#--case=}" ;;
         -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; exit 2 ;;
     esac
@@ -29,8 +33,23 @@ APP="$ROOT/dashboard"
 RUNTIME="$ROOT/.runtime"
 ENGINE_DB="$RUNTIME/current-affairs.sqlite3"
 ACTION_DB="$RUNTIME/batch-action-demo.sqlite3"
-ENGINE_PORT=8002
+ENGINE_PORT="${SMARTFLOW_ENGINE_PORT:-8002}"
 AS_OF="2026-10-03T12:00:00Z"
+SELECTED_DB="$ENGINE_DB"
+DATASET_ID=operations-demo-v1
+BATCH_ID=operations-demo-v1-batch-002
+CASE_LABEL="Heat evidence → operator Quarantine → QA review"
+if [ "$DEMO_CASE" != hot ]; then
+    SELECTED_DB="$ACTION_DB"
+    DATASET_ID=operations-action-demo-v1
+    if [ "$DEMO_CASE" = buffer ]; then
+        BATCH_ID=operations-action-demo-v1-batch-001
+        CASE_LABEL="Historical replay → computed BUFFER → operator decision"
+    else
+        BATCH_ID=operations-action-demo-v1-batch-002
+        CASE_LABEL="Historical replay → computed EXPEDITE → logistics review; QA still required"
+    fi
+fi
 
 step() { printf '\n\033[1;36m==> %s\033[0m\n' "$*"; }
 
@@ -62,14 +81,18 @@ if [ ! -f "$ENGINE_DB" ]; then
     "${PY[@]}" -m baselhack.data_engine import-cache
     "${PY[@]}" -m baselhack.data_engine seed --output output/operations-demo.json
     "${PY[@]}" -m baselhack.integration analyze
-    "${PY[@]}" -m baselhack.integration configure-batches
-    for batch in 001 002 003 004; do
-        "${PY[@]}" -m baselhack.integration analyze-batch \
-            --dataset-id operations-demo-v1 \
-            --batch-id "operations-demo-v1-batch-$batch" \
-            --as-of "$AS_OF" >/dev/null
-    done
 fi
+
+# An existing engine database may predate the batch layer. Preparing these
+# immutable records is idempotent; file existence alone does not prove readiness.
+step "Ensuring the four stored batch assessments are ready"
+"${PY[@]}" -m baselhack.integration configure-batches
+for batch in 001 002 003 004; do
+    "${PY[@]}" -m baselhack.integration analyze-batch \
+        --dataset-id operations-demo-v1 \
+        --batch-id "operations-demo-v1-batch-$batch" \
+        --as-of "$AS_OF" >/dev/null
+done
 
 if [ ! -f "$ACTION_DB" ]; then
     step "Building action demo database"
@@ -136,10 +159,14 @@ cleanup() { [ "${#PIDS[@]}" -gt 0 ] && kill "${PIDS[@]}" 2>/dev/null || true; }
 trap cleanup EXIT INT TERM
 
 if curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments" >/dev/null 2>&1; then
+    if ! curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments?dataset_id=$DATASET_ID" | "${PY[@]}" -c 'import json,sys; sys.exit(0 if json.load(sys.stdin) else 1)'; then
+        echo "Port $ENGINE_PORT is serving a different dataset. Stop that API or choose a free SMARTFLOW_ENGINE_PORT before switching cases." >&2
+        exit 1
+    fi
     step "Engine API already running on port $ENGINE_PORT"
 else
     step "Starting engine API on port $ENGINE_PORT"
-    "${PY[@]}" -m baselhack.integration serve --port "$ENGINE_PORT" &
+    "${PY[@]}" -m baselhack.integration serve --port "$ENGINE_PORT" --database "$SELECTED_DB" &
     PIDS+=($!)
     for _ in $(seq 1 30); do
         curl -fs "http://127.0.0.1:$ENGINE_PORT/api/integration/batch-assessments" >/dev/null 2>&1 && break
@@ -147,8 +174,8 @@ else
     done
 fi
 
-step "Preparing batch briefings (AI with ANTHROPIC_API_KEY, otherwise template)"
-(cd "$APP" && php artisan batches:brief) || echo "Briefings will be generated on first view."
+step "Preparing cached batch briefings (API, then local Codex, then template)"
+(cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" SMARTFLOW_CODEX_BRIEFINGS=true php artisan batches:brief) || echo "Briefings will use the evidence template on first view."
 
 APP_URL=""
 if command -v herd >/dev/null 2>&1 && herd links 2>/dev/null | grep -q "$APP"; then
@@ -159,20 +186,28 @@ cat <<EOF
 
 Smartflow demo
   Logins (password: secret): operator@example.com · qa@example.com · logistics@example.com
-  Hot day: Batches → Batch 002 → operator chooses Quarantine → QA accepts from the overview
+  Selected case: $CASE_LABEL
+  Dataset: $DATASET_ID
+  Operator and approver: open /batches/$BATCH_ID in separate signed-in browser profiles
+  After acceptance or denial: refresh the operator tab to show the recorded result
   Shortcut: type "." in an empty reason or next-action field to type the prepared text
-  Between rehearsals: bash scripts/demo.sh --reset
+  Between rehearsals: bash scripts/demo.sh --case=$DEMO_CASE --reset
 EOF
 
 if [ -n "$APP_URL" ]; then
+    if [ "$ENGINE_PORT" != 8002 ]; then
+        echo "For Herd, set DATA_ENGINE_URL=http://127.0.0.1:$ENGINE_PORT in dashboard/.env and clear Laravel config." >&2
+    fi
     printf '  App: %s (served by Herd)\n' "$APP_URL"
+    printf '  Direct case: %s/batches/%s\n' "${APP_URL%/}" "$BATCH_ID"
     if [ "${#PIDS[@]}" -gt 0 ]; then
         printf '\nPress Ctrl+C to stop the engine.\n'
         wait
     fi
 else
     printf '  App: http://127.0.0.1:8000\n\nPress Ctrl+C to stop.\n'
-    (cd "$APP" && php artisan serve --host 127.0.0.1 --port 8000) &
+    printf '  Direct case: http://127.0.0.1:8000/batches/%s\n' "$BATCH_ID"
+    (cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" php artisan serve --host 127.0.0.1 --port 8000) &
     PIDS+=($!)
     wait
 fi

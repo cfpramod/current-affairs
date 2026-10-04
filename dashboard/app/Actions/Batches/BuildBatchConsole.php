@@ -7,10 +7,10 @@ namespace App\Actions\Batches;
 use App\Data\BatchConsoleData;
 use App\Data\BatchDecisionData;
 use App\Data\BatchRecommendationData;
-use App\Enums\BatchDecisionStatus;
 use App\Exceptions\DataEngineUnavailable;
 use App\Integrations\DataEngine;
 use App\Models\BatchDecision;
+use App\Services\BatchDecisionPolicy;
 use Carbon\CarbonImmutable;
 
 final readonly class BuildBatchConsole
@@ -20,6 +20,7 @@ final readonly class BuildBatchConsole
         private FindLatestBatchAssessment $findLatest,
         private SummarizeBatchAssessment $summarize,
         private BriefBatch $brief,
+        private BatchDecisionPolicy $policy,
     ) {}
 
     /**
@@ -40,12 +41,14 @@ final readonly class BuildBatchConsole
         $batches = $dataset['batches'] ?? [];
         $batch = array_values(array_filter($batches, fn (array $candidate): bool => $candidate['id'] === $batchId))[0] ?? null;
         $chargeAt = (string) $assessment['production_readiness']['planned_charge_at'];
+
         $decisions = BatchDecision::query()
             ->with(['submitter', 'reviewer'])
             ->where('batch_id', $batchId)
             ->latest('submitted_at')
             ->get();
-        $active = $decisions->first(fn (BatchDecision $decision): bool => $decision->status !== BatchDecisionStatus::Denied);
+
+        $state = $this->policy->evaluateConsoleState($assessment, $batchId, $decisions);
 
         return new BatchConsoleData(
             batchId: $batchId,
@@ -65,8 +68,18 @@ final readonly class BuildBatchConsole
             limitations: array_values($assessment['limitations']),
             assessment: $assessment,
             decisions: array_values($decisions->map(BatchDecisionData::fromModel(...))->all()),
-            activeDecision: $active === null ? null : BatchDecisionData::fromModel($active),
+            activeDecision: $state['activeDecision'],
             briefing: $this->brief->handle($assessment),
+            activeMaterialDecision: $state['activeMaterialDecision'],
+            activeTransportDecision: $state['activeTransportDecision'],
+            qaProspect: $state['qaProspect'],
+            materialHeld: $state['materialHeld'],
+            expediteAllowed: $state['expediteAllowed'],
+            expediteBlockedReason: $state['expediteBlockedReason'],
+            bufferAllowed: $state['bufferAllowed'],
+            bufferBlockedReason: $state['bufferBlockedReason'],
+            runAllowed: $state['runAllowed'],
+            runBlockedReason: $state['runBlockedReason'],
         );
     }
 

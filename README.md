@@ -15,6 +15,8 @@ and the options it rejected, and **a person approves or overrides it**.
 
 Concept deck and team working pages: link in the team chat.
 
+Demo briefing preparation, named cases and direct batch links: [demo guide](docs/DEMO_BRIEFINGS.md).
+
 ## Screenshots
 
 The hot-day batch in the Smartflow app ([dashboard/](dashboard/)): the operator sees what needs a decision and the

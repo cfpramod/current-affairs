@@ -12,26 +12,25 @@ use App\Exceptions\DataEngineUnavailable;
 use App\Exceptions\DecisionNotAllowed;
 use App\Models\BatchDecision;
 use App\Models\User;
+use App\Services\BatchDecisionPolicy;
 use Carbon\CarbonImmutable;
 
 final readonly class SubmitBatchDecision
 {
-    public function __construct(private FindLatestBatchAssessment $findLatest) {}
+    public function __construct(
+        private FindLatestBatchAssessment $findLatest,
+        private BatchDecisionPolicy $policy,
+    ) {}
 
     /**
      * Record the operator's chosen action and reason against the exact stored
-     * assessment. Operator-owned actions take effect immediately; the others
-     * wait for review by the responsible role.
+     * assessment, enforcing material hold and transport workflow rules.
      *
      * @throws DecisionNotAllowed
      * @throws DataEngineUnavailable
      */
     public function handle(string $batchId, User $user, BatchDecisionInputData $input): BatchDecision
     {
-        if ($user->role !== UserRole::Operator) {
-            throw new DecisionNotAllowed('Only operators submit batch decisions.');
-        }
-
         $assessment = $this->findLatest->handle($batchId);
 
         if ($assessment === null) {
@@ -42,10 +41,10 @@ final readonly class SubmitBatchDecision
             throw new DecisionNotAllowed('A newer assessment is available. Reload before deciding.');
         }
 
-        if (BatchDecision::query()->where('batch_id', $batchId)->active()->exists()) {
-            throw new DecisionNotAllowed('This batch already has an open or accepted decision.');
-        }
+        $this->policy->validateSubmission($batchId, $user, $input->action, $assessment);
 
+        $linkage = $this->policy->resolveShipmentsAndLots($assessment);
+        $lane = $input->action->lane();
         $requiredRole = $input->action->approver();
         $modelAction = $assessment['recommendation']['action'] ?? null;
 
@@ -57,6 +56,9 @@ final readonly class SubmitBatchDecision
             'assessment' => $assessment,
             'model_action' => is_string($modelAction) ? ShipmentAction::from($modelAction) : null,
             'action' => $input->action,
+            'lane' => $lane,
+            'shipment_id' => $linkage['shipment_ids'][0] ?? null,
+            'lot_id' => $linkage['lot_ids'][0] ?? null,
             'required_role' => $requiredRole,
             'status' => $requiredRole === UserRole::Operator ? BatchDecisionStatus::Accepted : BatchDecisionStatus::Pending,
             'submitted_by' => $user->id,

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\BatchDecisionStatus;
+use App\Enums\DecisionLane;
+use App\Enums\QaProspect;
 use App\Enums\ShipmentAction;
 use App\Enums\UserRole;
 use Carbon\CarbonInterface;
@@ -27,6 +29,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array<string, mixed> $assessment
  * @property ?ShipmentAction $model_action
  * @property ShipmentAction $action
+ * @property DecisionLane $lane
+ * @property ?string $shipment_id
+ * @property ?string $lot_id
  * @property UserRole $required_role
  * @property BatchDecisionStatus $status
  * @property int $submitted_by
@@ -35,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ?int $reviewed_by
  * @property ?string $review_reason
  * @property ?string $next_action
+ * @property ?QaProspect $qa_prospect
  * @property bool $responsibility_confirmed
  * @property ?CarbonInterface $reviewed_at
  * @property-read User $submitter
@@ -64,7 +70,7 @@ final class BatchDecision extends Model
     }
 
     /**
-     * Decisions that block a new submission for the same batch.
+     * Decisions that block a new submission for the same batch or lane.
      *
      * @param  Builder<self>  $query
      */
@@ -72,6 +78,17 @@ final class BatchDecision extends Model
     protected function active(Builder $query): void
     {
         $query->whereIn('status', [BatchDecisionStatus::Pending, BatchDecisionStatus::Accepted]);
+    }
+
+    /**
+     * Scope decisions by lane.
+     *
+     * @param  Builder<self>  $query
+     */
+    #[Scope]
+    protected function lane(Builder $query, DecisionLane|string $lane): void
+    {
+        $query->where('lane', $lane instanceof DecisionLane ? $lane->value : $lane);
     }
 
     /**
@@ -84,10 +101,12 @@ final class BatchDecision extends Model
             'assessment' => 'array',
             'model_action' => ShipmentAction::class,
             'action' => ShipmentAction::class,
+            'lane' => DecisionLane::class,
             'required_role' => UserRole::class,
             'status' => BatchDecisionStatus::class,
             'submitted_at' => 'datetime',
             'responsibility_confirmed' => 'boolean',
+            'qa_prospect' => QaProspect::class,
             'reviewed_at' => 'datetime',
         ];
     }

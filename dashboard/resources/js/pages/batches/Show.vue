@@ -24,7 +24,7 @@ import {
 import { demoText, vDemoFill } from '@/lib/demo-autofill';
 import type { DemoField } from '@/lib/demo-autofill';
 import { index } from '@/routes/batches';
-import type { ActionKey, BatchConsole } from '@/types/console';
+import type { ActionKey, BatchConsole, BatchDecision } from '@/types/console';
 
 const props = defineProps<{
     batch: BatchConsole | null;
@@ -55,12 +55,15 @@ const submitForm = useForm({
     reason: '',
 });
 
+const reviewingDecision = ref<BatchDecision | null>(null);
+
 const reviewOpen = ref(false);
 const reviewForm = useForm({
     accept: true,
     reason: '',
     next_action: '',
     responsibility_confirmed: false,
+    qa_prospect: null as 'unknown' | 'potentially_usable' | 'rejected' | null,
 });
 
 const submitError = computed(() => {
@@ -101,15 +104,17 @@ function submit(): void {
     });
 }
 
-function openReview(accept: boolean): void {
+function openReview(decision: BatchDecision, accept: boolean): void {
+    reviewingDecision.value = decision;
     reviewForm.reset();
     reviewForm.clearErrors();
     reviewForm.accept = accept;
+    reviewForm.qa_prospect = decision.action === 'QUARANTINE' && accept ? 'potentially_usable' : null;
     reviewOpen.value = true;
 }
 
 function review(): void {
-    const decision = props.batch?.activeDecision;
+    const decision = reviewingDecision.value ?? props.batch?.activeDecision;
 
     if (!decision) {
         return;
@@ -360,9 +365,11 @@ function resetDemo(): void {
                         <DialogTitle>
                             {{ reviewForm.accept ? 'Accept' : 'Deny' }}
                             {{
-                                batch.activeDecision
-                                    ? actionLabels[batch.activeDecision.action]
-                                    : ''
+                                reviewingDecision
+                                    ? actionLabels[reviewingDecision.action]
+                                    : batch.activeDecision
+                                      ? actionLabels[batch.activeDecision.action]
+                                      : ''
                             }}
                         </DialogTitle>
                         <DialogDescription>
@@ -386,6 +393,41 @@ function resetDemo(): void {
                         />
                     </label>
                     <template v-if="reviewForm.accept">
+                        <div
+                            v-if="reviewingDecision?.action === 'QUARANTINE'"
+                            class="flex flex-col gap-2 rounded-lg border bg-muted/40 p-3 text-sm"
+                        >
+                            <span class="font-medium">QA Preliminary Prospect Assessment</span>
+                            <span class="text-xs text-muted-foreground">
+                                Quarantined material is blocked from production. State whether preliminary checks indicate potential usability for salvage transport.
+                            </span>
+                            <div class="flex flex-col gap-1.5 mt-1">
+                                <label class="flex items-center gap-2 text-xs cursor-pointer">
+                                    <input
+                                        v-model="reviewForm.qa_prospect"
+                                        type="radio"
+                                        value="potentially_usable"
+                                    />
+                                    <span><b>Potentially usable after checks</b> — allows conditional expedite</span>
+                                </label>
+                                <label class="flex items-center gap-2 text-xs cursor-pointer">
+                                    <input
+                                        v-model="reviewForm.qa_prospect"
+                                        type="radio"
+                                        value="rejected"
+                                    />
+                                    <span><b>Rejected for production</b> — blocks salvage expedite</span>
+                                </label>
+                                <label class="flex items-center gap-2 text-xs cursor-pointer">
+                                    <input
+                                        v-model="reviewForm.qa_prospect"
+                                        type="radio"
+                                        value="unknown"
+                                    />
+                                    <span><b>Unknown / checks pending</b> — expedite blocked pending checks</span>
+                                </label>
+                            </div>
+                        </div>
                         <label class="flex flex-col gap-1.5 text-sm">
                             <span class="font-medium"
                                 >Next action (required)</span

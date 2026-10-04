@@ -34,4 +34,15 @@ enum ShipmentAction: string
             self::RunAsPlanned, self::Buffer => UserRole::Operator,
         };
     }
+
+    /**
+     * The decision lane this action belongs to.
+     */
+    public function lane(): DecisionLane
+    {
+        return match ($this) {
+            self::Quarantine, self::RunAsPlanned, self::Buffer => DecisionLane::Material,
+            self::Expedite, self::Reroute => DecisionLane::Transport,
+        };
+    }
 }

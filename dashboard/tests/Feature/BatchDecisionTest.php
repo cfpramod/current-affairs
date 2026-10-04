@@ -103,7 +103,11 @@ test('an operator quarantine request waits for QA and keeps the exact assessment
 });
 
 test('an operator-owned action takes effect without review', function () {
-    fakeEngine();
+    $assessments = json_decode((string) file_get_contents(base_path('../output/batch-assessments-demo.json')), true, 512, JSON_THROW_ON_ERROR);
+    $assessments[1]['production_readiness']['status'] = 'RESERVED_STOCK_SUFFICIENT';
+    $assessments[1]['production_readiness']['released_reserved_quantity_kg'] = 50.0;
+
+    fakeEngine($assessments);
 
     submitAs(UserRole::Operator, 'BUFFER')->assertSessionHasNoErrors();
 
@@ -129,10 +133,10 @@ test('a batch takes a new request only after the previous one was denied', funct
     fakeEngine();
     submitAs(UserRole::Operator, 'QUARANTINE')->assertSessionHasNoErrors();
 
-    submitAs(UserRole::Operator, 'EXPEDITE')->assertSessionHasErrors(['decision' => 'This batch already has an open or accepted decision.']);
+    submitAs(UserRole::Operator, 'QUARANTINE')->assertSessionHasErrors(['decision' => 'This batch already has an open or accepted material decision.']);
 
     reviewAs(UserRole::Qa, BatchDecision::query()->sole(), ['accept' => false])->assertSessionHasNoErrors();
-    submitAs(UserRole::Operator, 'EXPEDITE')->assertSessionHasNoErrors();
+    submitAs(UserRole::Operator, 'QUARANTINE')->assertSessionHasNoErrors();
 
     expect(BatchDecision::query()->pluck('status')->all())->toEqualCanonicalizing([BatchDecisionStatus::Denied, BatchDecisionStatus::Pending]);
 });

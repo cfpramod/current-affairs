@@ -21,6 +21,13 @@ const verdictDot: Record<Verdict, string> = {
     at_risk: 'bg-amber-500',
     unknown: 'bg-muted-foreground/40',
 };
+
+const verdictLabels: Record<Verdict, string> = {
+    yes: 'Yes',
+    no: 'No',
+    at_risk: 'At risk',
+    unknown: 'Unknown',
+};
 </script>
 
 <template>
@@ -106,9 +113,10 @@ const verdictDot: Record<Verdict, string> = {
                             />
                             {{
                                 answer.question.startsWith('Material')
-                                    ? 'Ready'
-                                    : 'Good'
+                                    ? 'Readiness'
+                                    : 'Quality'
                             }}
+                            : {{ verdictLabels[answer.verdict] }}
                         </span>
                     </span>
                 </Link>

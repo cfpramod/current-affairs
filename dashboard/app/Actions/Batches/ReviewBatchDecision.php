@@ -6,30 +6,41 @@ namespace App\Actions\Batches;
 
 use App\Data\BatchReviewInputData;
 use App\Enums\BatchDecisionStatus;
+use App\Enums\QaProspect;
+use App\Enums\ShipmentAction;
+use App\Exceptions\DataEngineUnavailable;
 use App\Exceptions\DecisionNotAllowed;
 use App\Models\BatchDecision;
 use App\Models\User;
+use App\Services\BatchDecisionPolicy;
 
-final class ReviewBatchDecision
+final readonly class ReviewBatchDecision
 {
+    public function __construct(
+        private FindLatestBatchAssessment $findLatest,
+        private BatchDecisionPolicy $policy,
+    ) {}
+
     /**
      * The responsible role accepts or denies an operator's request. Accepting
-     * also commits that role to a stated next action.
+     * also commits that role to a stated next action and revalidates transport gates.
      *
      * @throws DecisionNotAllowed
+     * @throws DataEngineUnavailable
      */
     public function handle(BatchDecision $decision, User $user, BatchReviewInputData $input): BatchDecision
     {
-        if ($decision->status !== BatchDecisionStatus::Pending) {
-            throw new DecisionNotAllowed('This request has already been reviewed.');
+        $latestAssessment = $this->findLatest->handle($decision->batch_id);
+
+        if ($latestAssessment === null) {
+            throw new DecisionNotAllowed('No stored assessment exists for this batch.');
         }
 
-        if ($user->role !== $decision->required_role) {
-            throw new DecisionNotAllowed(sprintf('This request needs %s review.', $decision->required_role->label()));
-        }
+        $this->policy->validateReview($decision, $user, $input, $latestAssessment);
 
-        if ($input->accept && (in_array($input->nextAction, [null, ''], true) || ! $input->responsibilityConfirmed)) {
-            throw new DecisionNotAllowed('To accept, state the next action and confirm your team will take it.');
+        $qaProspect = null;
+        if ($decision->action === ShipmentAction::Quarantine && $input->accept) {
+            $qaProspect = $input->qaProspect ?? QaProspect::Unknown;
         }
 
         $decision->update([
@@ -38,6 +49,7 @@ final class ReviewBatchDecision
             'review_reason' => $input->reason,
             'next_action' => $input->accept ? $input->nextAction : null,
             'responsibility_confirmed' => $input->accept,
+            'qa_prospect' => $qaProspect,
             'reviewed_at' => now(),
         ]);
 

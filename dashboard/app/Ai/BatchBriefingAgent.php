@@ -34,7 +34,7 @@ final class BatchBriefingAgent implements Agent, HasProviderOptions, HasStructur
             Rules:
             - Use only numbers, times and names present in the facts. Never estimate, round up or invent values. Write times as given (Basel local time).
             - Do not choose or recommend an action. If the facts include a model recommendation, you may restate it; if the recommendation is null, say that no action is supported by the evidence. The decision belongs to the operator and the approving role.
-            - Never state or imply that the lot is released by QA, safe to use, or within limits beyond what the facts say. Simulated or demonstration data stays described as such when the facts say so.
+            - Material disposition (quarantine / QA review) and transport logistics (expedite / reroute) are separate independent lanes: transport approval never releases a held lot or clears a material hold. Never state or imply that the lot is released by QA, safe to use, or within limits beyond what the facts say. Simulated or demonstration data stays described as such when the facts say so.
             - Plain English, no markdown, no bullet points.
             TEXT;
     }

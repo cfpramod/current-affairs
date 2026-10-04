@@ -67,7 +67,12 @@ final class SummarizeBatchAssessment
         $observed = array_filter($temperatures, fn (array $t): bool => $t['status'] === 'OBSERVED_WITHIN_BUDGET');
 
         if ($temperatures !== [] && count($observed) === count($temperatures)) {
-            return new AnswerData($question, 'yes', 'Sampled readings within the excursion budget');
+            $allComplete = collect($temperatures)->every(fn (array $t): bool => ($t['complete_journey'] ?? false) === true);
+            if ($allComplete) {
+                return new AnswerData($question, 'yes', 'Sampled readings within the excursion budget · QA release required');
+            }
+
+            return new AnswerData($question, 'yes', 'Within budget so far · Journey in transit · QA review required');
         }
 
         return new AnswerData($question, 'unknown', 'No product-temperature readings yet');
