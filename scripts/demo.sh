@@ -6,24 +6,27 @@
 #   bash scripts/demo.sh --reset    also clear batch decisions (between rehearsals)
 #   bash scripts/demo.sh --fresh    rebuild engine databases and reseed the app
 #   bash scripts/demo.sh --setup    prepare only, don't serve
+#   bash scripts/demo.sh --no-ai    skip AI/Codex briefings; pages show the evidence template
 #   bash scripts/demo.sh --case=hot       heat evidence and QA workflow
 #   bash scripts/demo.sh --case=buffer    computed safety-stock replay
 #   bash scripts/demo.sh --case=expedite  computed logistics replay (default)
 #
 # Engine: Python via pixi when installed, otherwise a uv venv in .runtime/venv.
-# App: served by Laravel Herd when it serves this folder, otherwise on port 8000.
+# App: served by Laravel Herd when it serves this folder, otherwise on port 8000
+# (SMARTFLOW_APP_PORT overrides it, like SMARTFLOW_ENGINE_PORT for the engine).
 # The engine and app databases stay separate; Laravel never migrates the engine's.
 
 set -euo pipefail
 
-FRESH=0 RESET=0 SERVE=1 DEMO_CASE=expedite
+FRESH=0 RESET=0 SERVE=1 BRIEF=1 DEMO_CASE=expedite
 for arg in "$@"; do
     case "$arg" in
         --fresh) FRESH=1 ;;
         --reset) RESET=1 ;;
         --setup) SERVE=0 ;;
+        --no-ai) BRIEF=0 ;;
         --case=hot|--case=buffer|--case=expedite) DEMO_CASE="${arg#--case=}" ;;
-        -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+        -h|--help) sed -n '2,13p' "$0"; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; exit 2 ;;
     esac
 done
@@ -34,6 +37,7 @@ RUNTIME="$ROOT/.runtime"
 ENGINE_DB="$RUNTIME/current-affairs.sqlite3"
 ACTION_DB="$RUNTIME/batch-action-demo.sqlite3"
 ENGINE_PORT="${SMARTFLOW_ENGINE_PORT:-8002}"
+APP_PORT="${SMARTFLOW_APP_PORT:-8000}"
 AS_OF="2026-10-03T12:00:00Z"
 SELECTED_DB="$ENGINE_DB"
 DATASET_ID=operations-demo-v1
@@ -106,7 +110,12 @@ if [ ! -f .env ]; then
     step "Creating dashboard/.env from env.example"
     cp env.example .env
 fi
-grep -q '^DATA_ENGINE_URL=' .env || printf '\nDATA_ENGINE_URL=http://127.0.0.1:%s\n' "$ENGINE_PORT" >> .env
+# artisan serve and Herd read .env, not this shell, so point it at this run's engine.
+if grep -q '^DATA_ENGINE_URL=' .env; then
+    sed -i.bak "s|^DATA_ENGINE_URL=.*|DATA_ENGINE_URL=http://127.0.0.1:$ENGINE_PORT|" .env && rm -f .env.bak
+else
+    printf '\nDATA_ENGINE_URL=http://127.0.0.1:%s\n' "$ENGINE_PORT" >> .env
+fi
 # Typing "." into an empty decision field types the prepared demo text.
 if grep -q '^SMARTFLOW_DEMO_AUTOFILL=' .env; then
     sed -i.bak 's/^SMARTFLOW_DEMO_AUTOFILL=.*/SMARTFLOW_DEMO_AUTOFILL=true/' .env && rm -f .env.bak
@@ -177,8 +186,8 @@ APP_URL=""
 if command -v herd >/dev/null 2>&1 && herd links 2>/dev/null | grep -q "$APP"; then
     APP_URL="$(herd links 2>/dev/null | grep "$APP" | grep -o 'https\?://[^ |]*' | head -1)"
 fi
-if [ -z "$APP_URL" ] && port_in_use 8000; then
-    echo "Port 8000 is already in use. Stop the other server (lsof -i :8000 shows it), then run this again." >&2
+if [ -z "$APP_URL" ] && port_in_use "$APP_PORT"; then
+    echo "Port $APP_PORT is already in use. Stop the other server (lsof -i :$APP_PORT shows it) or set SMARTFLOW_APP_PORT, then run this again." >&2
     exit 1
 fi
 
@@ -212,8 +221,12 @@ else
     fi
 fi
 
-step "Preparing cached batch briefings (API, then local Codex, then template)"
-(cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" SMARTFLOW_CODEX_BRIEFINGS=true php artisan batches:brief) || echo "Pages will show the evidence template until briefings are prepared (php artisan batches:brief)."
+if [ "$BRIEF" = 1 ]; then
+    step "Preparing cached batch briefings (API, then local Codex, then template)"
+    (cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" SMARTFLOW_CODEX_BRIEFINGS=true php artisan batches:brief) || echo "Pages will show the evidence template until briefings are prepared (php artisan batches:brief)."
+else
+    step "Skipping AI briefings (--no-ai): pages show the evidence template unless a briefing was prepared earlier"
+fi
 
 cat <<EOF
 
@@ -228,9 +241,6 @@ Smartflow demo
 EOF
 
 if [ -n "$APP_URL" ]; then
-    if [ "$ENGINE_PORT" != 8002 ]; then
-        echo "For Herd, set DATA_ENGINE_URL=http://127.0.0.1:$ENGINE_PORT in dashboard/.env and clear Laravel config." >&2
-    fi
     printf '  App: %s (served by Herd)\n' "$APP_URL"
     printf '  Direct case: %s/batches/%s\n' "${APP_URL%/}" "$BATCH_ID"
     if [ "${#PIDS[@]}" -gt 0 ]; then
@@ -238,9 +248,9 @@ if [ -n "$APP_URL" ]; then
         wait
     fi
 else
-    printf '  App: http://127.0.0.1:8000\n\nPress Ctrl+C to stop.\n'
-    printf '  Direct case: http://127.0.0.1:8000/batches/%s\n' "$BATCH_ID"
-    (cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" PHP_CLI_SERVER_WORKERS=4 php artisan serve --host 127.0.0.1 --port 8000) &
+    printf '  App: http://127.0.0.1:%s\n\nPress Ctrl+C to stop.\n' "$APP_PORT"
+    printf '  Direct case: http://127.0.0.1:%s/batches/%s\n' "$APP_PORT" "$BATCH_ID"
+    (cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" PHP_CLI_SERVER_WORKERS=4 php artisan serve --no-reload --host 127.0.0.1 --port "$APP_PORT") &
     PIDS+=($!)
     wait
 fi

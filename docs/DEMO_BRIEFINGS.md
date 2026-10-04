@@ -17,6 +17,20 @@ in an empty temporary folder with a read-only sandbox, without loading user
 configuration. Temporary output is removed after parsing. The prepared text is
 stored in Laravel's local database and requires no model request during the demo.
 
+## Demo without AI or Codex
+
+```sh
+bash scripts/demo.sh --case=hot --no-ai
+```
+
+`--no-ai` skips briefing preparation, so nothing needs a network, API key or
+Codex login. Every batch page shows the evidence template, worded from the
+stored assessment (for Batch 002: "Over temperature budget: 148 of 120 min
+outside 2–8 °C", plus the QA note). The card is labelled as a template, not AI.
+Briefings prepared on an earlier run stay stored and are still shown.
+
+## Prepare AI briefings manually
+
 To prepare manually while the selected engine API is running:
 
 ```sh
@@ -52,8 +66,10 @@ Expedite is the default demo case. Hot is the original evidence/QA case.
 Buffer and expedite are separate September 30
 historical replays, labelled as such. An API already running with a different
 dataset is detected; stop it before switching, or select a free port with
-`SMARTFLOW_ENGINE_PORT`. The Laravel dev server receives the selected API URL.
-With Herd and a nondefault port, update its local `DATA_ENGINE_URL` too.
+`SMARTFLOW_ENGINE_PORT`. The script writes the selected API URL into
+`dashboard/.env`, so both the Laravel dev server and Herd use it. If port 8000
+is taken, the script stops with a message; set `SMARTFLOW_APP_PORT` to serve the
+app elsewhere.
 
 For a roughly one-minute deck handoff: show the batch's briefing and evidence
 (15 seconds), submit the operator action and reason (15 seconds), switch to the
