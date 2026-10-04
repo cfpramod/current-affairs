@@ -69,7 +69,7 @@ final readonly class BuildBatchConsole
             assessment: $assessment,
             decisions: array_values($decisions->map(BatchDecisionData::fromModel(...))->all()),
             activeDecision: $state['activeDecision'],
-            briefing: $this->brief->handle($assessment),
+            briefing: $this->brief->stored($assessment),
             activeMaterialDecision: $state['activeMaterialDecision'],
             activeTransportDecision: $state['activeTransportDecision'],
             qaProspect: $state['qaProspect'],

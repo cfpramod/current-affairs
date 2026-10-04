@@ -175,7 +175,7 @@ else
 fi
 
 step "Preparing cached batch briefings (API, then local Codex, then template)"
-(cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" SMARTFLOW_CODEX_BRIEFINGS=true php artisan batches:brief) || echo "Briefings will use the evidence template on first view."
+(cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" SMARTFLOW_CODEX_BRIEFINGS=true php artisan batches:brief) || echo "Pages will show the evidence template until briefings are prepared (php artisan batches:brief)."
 
 APP_URL=""
 if command -v herd >/dev/null 2>&1 && herd links 2>/dev/null | grep -q "$APP"; then
@@ -207,7 +207,7 @@ if [ -n "$APP_URL" ]; then
 else
     printf '  App: http://127.0.0.1:8000\n\nPress Ctrl+C to stop.\n'
     printf '  Direct case: http://127.0.0.1:8000/batches/%s\n' "$BATCH_ID"
-    (cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" php artisan serve --host 127.0.0.1 --port 8000) &
+    (cd "$APP" && DATA_ENGINE_URL="http://127.0.0.1:$ENGINE_PORT" PHP_CLI_SERVER_WORKERS=4 php artisan serve --host 127.0.0.1 --port 8000) &
     PIDS+=($!)
     wait
 fi

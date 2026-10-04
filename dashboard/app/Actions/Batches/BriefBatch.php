@@ -15,8 +15,10 @@ use Throwable;
 /**
  * A plain-language briefing for one stored batch assessment. The LLM only
  * words the facts; it never decides. Assessments are immutable, so an LLM
- * briefing is generated once and reused. Without an API key, or if the
- * provider fails, local Codex is tried before the evidence template.
+ * briefing is generated once (by `batches:brief`) and reused. Without an API
+ * key, or if the provider fails, local Codex is tried before the evidence
+ * template. Page loads only read the stored briefing (`stored`), so a slow or
+ * failing provider never blocks the console.
  */
 final class BriefBatch
 {
@@ -29,10 +31,10 @@ final class BriefBatch
      */
     public function handle(array $assessment): BatchBriefingData
     {
-        $stored = BatchBriefing::query()->where('assessment_id', $assessment['assessment_id'])->first();
+        $stored = $this->find($assessment);
 
-        if ($stored !== null) {
-            return new BatchBriefingData($stored->headline, $stored->summary, $stored->qa_note, $stored->source, $stored->model);
+        if ($stored instanceof BatchBriefingData) {
+            return $stored;
         }
 
         $facts = $this->facts($assessment);
@@ -52,6 +54,27 @@ final class BriefBatch
         }
 
         return $this->template($facts);
+    }
+
+    /**
+     * The prepared briefing, or the evidence template when none is stored.
+     * Never calls a provider.
+     *
+     * @param  array<string, mixed>  $assessment
+     */
+    public function stored(array $assessment): BatchBriefingData
+    {
+        return $this->find($assessment) ?? $this->template($this->facts($assessment));
+    }
+
+    /**
+     * @param  array<string, mixed>  $assessment
+     */
+    private function find(array $assessment): ?BatchBriefingData
+    {
+        $stored = BatchBriefing::query()->where('assessment_id', $assessment['assessment_id'])->first();
+
+        return $stored === null ? null : new BatchBriefingData($stored->headline, $stored->summary, $stored->qa_note, $stored->source, $stored->model);
     }
 
     /**

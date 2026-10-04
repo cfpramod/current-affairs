@@ -159,6 +159,41 @@ test('the batch console includes the briefing', function () {
         );
 });
 
+test('a console page view never calls a briefing provider', function () {
+    config(['briefing.enabled' => true, 'briefing.codex.enabled' => true]);
+    fakeEngine();
+    BatchBriefingAgent::fake();
+    Process::fake();
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('batches.show', HOT_BATCH))
+        ->assertInertia(fn (Assert $page) => $page->where('batch.briefing.source', 'template'));
+
+    BatchBriefingAgent::assertNeverPrompted();
+    Process::assertNothingRan();
+    expect(BatchBriefing::query()->count())->toBe(0);
+});
+
+test('the batch console shows a prepared briefing', function () {
+    fakeEngine();
+    BatchBriefing::query()->create([
+        'assessment_id' => hotAssessmentId(),
+        'batch_id' => HOT_BATCH,
+        'source' => 'codex',
+        'model' => 'Codex CLI',
+        'headline' => 'Prepared ahead of the demo',
+        'summary' => 'From the stored facts.',
+        'qa_note' => null,
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('batches.show', HOT_BATCH))
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('batch.briefing.source', 'codex')
+            ->where('batch.briefing.headline', 'Prepared ahead of the demo'),
+        );
+});
+
 test('briefings can be prepared for every batch ahead of a demo', function () {
     config(['briefing.enabled' => true]);
     fakeEngine();

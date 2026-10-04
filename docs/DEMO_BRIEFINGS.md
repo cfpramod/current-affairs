@@ -1,7 +1,10 @@
 # Demo briefings
 
-Briefings are tied to the immutable assessment ID. The order is cached AI text,
-configured API provider, opt-in local Codex CLI, then the evidence template.
+Briefings are tied to the immutable assessment ID. `batches:brief` generates them
+in this order: configured API provider, opt-in local Codex CLI, then the evidence
+template. Batch pages never call a provider: they show the stored briefing, or the
+evidence template when none was prepared, so a slow or failing provider cannot
+block a page load.
 Codex receives the same facts and instructions as the API, including incomplete
 journey status. It only words the evidence; it never selects an action or releases
 a lot. Its JSON is validated before storage, and its source stays labelled when
