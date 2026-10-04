@@ -15,6 +15,19 @@ and the options it rejected, and **a person approves or overrides it**.
 
 Concept deck and team working pages: link in the team chat.
 
+## Screenshots
+
+The hot-day batch in the Smartflow app ([dashboard/](dashboard/)): the operator sees what needs a decision and the
+evidence behind it, chooses quarantine with a reason, and QA accepts it with a next action.
+
+| Operator overview | Batch console |
+| --- | --- |
+| ![Operator overview](docs/screenshots/operator-overview.jpg) | ![Batch console](docs/screenshots/batch-console.jpg) |
+| **Evidence** | **QA review queue** |
+| ![Temperature, readiness and incoming shipment evidence](docs/screenshots/batch-evidence.jpg) | ![QA review queue](docs/screenshots/qa-review-queue.jpg) |
+| **Accepted decision** | |
+| ![Accepted decision with both reasons](docs/screenshots/qa-accepted.jpg) | |
+
 ---
 
 ## Where we are: a starting point, not the solution
