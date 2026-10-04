@@ -19,6 +19,7 @@ final readonly class BuildBatchConsole
         private DataEngine $engine,
         private FindLatestBatchAssessment $findLatest,
         private SummarizeBatchAssessment $summarize,
+        private BriefBatch $brief,
     ) {}
 
     /**
@@ -65,6 +66,7 @@ final readonly class BuildBatchConsole
             assessment: $assessment,
             decisions: array_values($decisions->map(BatchDecisionData::fromModel(...))->all()),
             activeDecision: $active === null ? null : BatchDecisionData::fromModel($active),
+            briefing: $this->brief->handle($assessment),
         );
     }
 

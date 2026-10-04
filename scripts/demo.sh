@@ -141,6 +141,9 @@ else
     done
 fi
 
+step "Preparing batch briefings (AI with ANTHROPIC_API_KEY, otherwise template)"
+(cd "$APP" && php artisan batches:brief) || echo "Briefings will be generated on first view."
+
 APP_URL=""
 if command -v herd >/dev/null 2>&1 && herd links 2>/dev/null | grep -q "$APP"; then
     APP_URL="$(herd links 2>/dev/null | grep "$APP" | grep -o 'https\?://[^ |]*' | head -1)"

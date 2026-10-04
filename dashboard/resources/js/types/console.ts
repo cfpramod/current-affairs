@@ -174,7 +174,16 @@ export type BatchTemperatureSeries = {
     exposures: Exposure[];
 };
 
+export type BatchBriefing = {
+    headline: string;
+    summary: string;
+    qaNote: string | null;
+    source: 'llm' | 'template';
+    model: string | null;
+};
+
 export type BatchConsole = Omit<BatchListItem, 'decision'> & {
+    briefing: BatchBriefing;
     assessmentId: string;
     production: ProductionReadiness;
     incoming: IncomingShipmentResult[];

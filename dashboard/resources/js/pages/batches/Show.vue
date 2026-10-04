@@ -2,6 +2,7 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import BatchDecisionController from '@/actions/App/Http/Controllers/BatchDecisionController';
+import BatchBriefingCard from '@/components/batch/BatchBriefingCard.vue';
 import BatchDecisionPanel from '@/components/batch/BatchDecisionPanel.vue';
 import BatchEvidence from '@/components/batch/BatchEvidence.vue';
 import AnswerCard from '@/components/console/AnswerCard.vue';
@@ -182,6 +183,8 @@ function resetDemo(): void {
                 <AnswerCard :answer="batch.answers.arrival" />
                 <AnswerCard :answer="batch.answers.quality" />
             </div>
+
+            <BatchBriefingCard :briefing="batch.briefing" />
 
             <BatchDecisionPanel
                 :batch="batch"

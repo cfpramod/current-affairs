@@ -40,5 +40,6 @@ final class BatchConsoleData extends Data
         public array $assessment,
         public array $decisions,
         public ?BatchDecisionData $activeDecision,
+        public BatchBriefingData $briefing,
     ) {}
 }
