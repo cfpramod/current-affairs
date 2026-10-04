@@ -45,8 +45,8 @@ final class BatchDecisionController extends Controller
     {
         try {
             $decision = $review->handle($batchDecision, $user, $request->toData());
-        } catch (DecisionNotAllowed $decisionNotAllowed) {
-            return back()->withErrors(['review' => $decisionNotAllowed->getMessage()]);
+        } catch (DecisionNotAllowed|DataEngineUnavailable $exception) {
+            return back()->withErrors(['review' => $exception->getMessage()]);
         }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => $decision->status === BatchDecisionStatus::Accepted

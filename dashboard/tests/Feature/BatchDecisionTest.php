@@ -187,6 +187,15 @@ test('a denial records the reason without a next action', function () {
         ->and($decision->next_action)->toBeNull();
 });
 
+test('a review while the engine is unreachable reports the outage instead of failing', function () {
+    $decision = BatchDecision::factory()->create(['batch_id' => HOT_BATCH]);
+    Http::fake(fn () => Http::failedConnection());
+
+    reviewAs(UserRole::Qa, $decision)->assertRedirect(route('batches.show', HOT_BATCH))->assertSessionHasErrors('review');
+
+    expect($decision->refresh()->status)->toBe(BatchDecisionStatus::Pending);
+});
+
 test('demo decisions can be reset', function () {
     BatchDecision::factory()->count(2)->create(['batch_id' => HOT_BATCH]);
 
