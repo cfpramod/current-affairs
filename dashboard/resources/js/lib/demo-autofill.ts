@@ -17,7 +17,7 @@ const fallback: Required<BatchScript> = {
     submit: {
         RUN_AS_PLANNED:
             'Material and temperature evidence support charging as planned.',
-        BUFFER: 'Charging from released safety stock while the incoming material is late.',
+        BUFFER: 'Released safety stock covers the full charge; charging from it as planned.',
         EXPEDITE:
             'Incoming material is late for the charge; asking logistics for a faster slot.',
         REROUTE:

@@ -52,12 +52,19 @@ def main(argv=None):
     parser.add_argument(
         "--database", type=Path, default=ROOT / ".runtime/batch-action-demo.sqlite3"
     )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=ROOT / "output",
+        help="where to write the JSON snapshots (the committed fixtures by default)",
+    )
     args = parser.parse_args(argv)
     dataset, records = prepare_action_demo(Database(args.database))
-    (ROOT / "output/operations-action-demo.json").write_text(
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    (args.output_dir / "operations-action-demo.json").write_text(
         dataset.model_dump_json(indent=2) + "\n"
     )
-    (ROOT / "output/batch-action-assessments-demo.json").write_text(
+    (args.output_dir / "batch-action-assessments-demo.json").write_text(
         json.dumps([record.model_dump(mode="json") for record in records], indent=2)
         + "\n"
     )

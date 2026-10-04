@@ -79,7 +79,7 @@ if [ ! -f "$ENGINE_DB" ]; then
     step "Building engine database (observations, operations, batch assessments)"
     "${PY[@]}" -m baselhack.data_engine init
     "${PY[@]}" -m baselhack.data_engine import-cache
-    "${PY[@]}" -m baselhack.data_engine seed --output output/operations-demo.json
+    "${PY[@]}" -m baselhack.data_engine seed --output "$RUNTIME/operations-demo.json"
     "${PY[@]}" -m baselhack.integration analyze
 fi
 
@@ -96,7 +96,7 @@ done
 
 if [ ! -f "$ACTION_DB" ]; then
     step "Building action demo database"
-    "${PY[@]}" -m baselhack.batch_demo
+    "${PY[@]}" -m baselhack.batch_demo --output-dir "$RUNTIME"
 fi
 
 # --- Laravel app -------------------------------------------------------------

@@ -65,3 +65,31 @@ def test_action_demo_preserves_acceptance_cases_and_serves_computed_actions(
     assert incoming.status == "MODELED"
     assert incoming.logistics.features.weather.observed_at == dataset.reference_at
     assert records[1].production_readiness.released_reserved_quantity_kg == 0
+
+
+def test_action_demo_writes_snapshots_to_the_chosen_folder_only(tmp_path):
+    from baselhack.batch_demo import main
+
+    committed = {
+        name: (ROOT / "output" / name).read_bytes()
+        for name in (
+            "operations-action-demo.json",
+            "batch-action-assessments-demo.json",
+        )
+    }
+
+    assert (
+        main(
+            [
+                "--database",
+                str(tmp_path / "action-demo.sqlite3"),
+                "--output-dir",
+                str(tmp_path / "out"),
+            ]
+        )
+        == 0
+    )
+
+    for name, content in committed.items():
+        assert (tmp_path / "out" / name).is_file()
+        assert (ROOT / "output" / name).read_bytes() == content

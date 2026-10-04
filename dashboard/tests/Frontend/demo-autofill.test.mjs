@@ -21,3 +21,10 @@ test('other batches and actions fall back to a generic text', () => {
     );
     assert.ok(demoText('unknown-batch', 'submit').length > 0);
 });
+
+test('the buffer text matches a batch covered by released stock', () => {
+    const text = demoText('operations-action-demo-v1-batch-001', 'submit', 'BUFFER');
+
+    assert.match(text, /released safety stock/i);
+    assert.doesNotMatch(text, /late/);
+});

@@ -61,7 +61,7 @@ final readonly class ListBatches
                     reactor: $reactors[$assessment['batch_id']] ?? null,
                     chargeAt: $chargeAt,
                     asOf: (string) $assessment['as_of'],
-                    retrospective: CarbonImmutable::parse($chargeAt)->lt(CarbonImmutable::parse($assessment['as_of'])),
+                    retrospective: CarbonImmutable::parse($chargeAt)->lte(CarbonImmutable::parse($assessment['as_of'])),
                     answers: $this->summarize->handle($assessment),
                     recommendation: BatchRecommendationData::fromEngine($assessment['recommendation']),
                     decision: $decision === null ? null : BatchDecisionData::fromModel($decision),

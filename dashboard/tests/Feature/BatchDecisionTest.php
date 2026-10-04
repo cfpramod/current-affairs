@@ -84,6 +84,24 @@ test('a batch whose shipment has no lot linkage shows the problem instead of fai
         );
 });
 
+test('a batch charging exactly at the assessment cutoff is retrospective everywhere', function () {
+    $assessments = json_decode((string) file_get_contents(base_path('../output/batch-assessments-demo.json')), true, 512, JSON_THROW_ON_ERROR);
+    $assessments = array_map(function (array $assessment): array {
+        if ($assessment['batch_id'] === HOT_BATCH) {
+            $assessment['production_readiness']['planned_charge_at'] = $assessment['as_of'];
+        }
+
+        return $assessment;
+    }, $assessments);
+    fakeEngine($assessments);
+    $user = User::factory()->role(UserRole::Operator)->create();
+
+    $this->actingAs($user)->get(route('batches.index'))
+        ->assertInertia(fn (Assert $page) => $page->where('batches.1.batchId', HOT_BATCH)->where('batches.1.retrospective', true));
+    $this->actingAs($user)->get(route('batches.show', HOT_BATCH))
+        ->assertInertia(fn (Assert $page) => $page->where('batch.retrospective', true)->where('batch.runBlockedReason', 'Retrospective assessment.'));
+});
+
 test('an unknown batch is not found', function () {
     fakeEngine();
 
