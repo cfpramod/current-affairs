@@ -2,7 +2,19 @@
 
 Reliability review of feat/demo-codex-briefings (2026-10-04, cloud session).
 
-Status: review done, fixes approved by @cfpramod, NOT yet implemented. Continue
+Status (2026-10-04, laptop session): all approved fixes implemented on this
+branch, one commit each (4a95f8a, 2551cb5, d285625, 35b64fa, f4038b1, 2079de0),
+plus 61d3a72: `demo.sh --no-ai` runs the demo on evidence templates (no API,
+no Codex), writes the selected engine URL into dashboard/.env (artisan serve
+does not pass shell variables to its PHP server), adds SMARTFLOW_APP_PORT, and
+adds `--no-reload` so PHP_CLI_SERVER_WORKERS=4 takes effect. Checked: Laravel
+109 pass / 2 skipped; frontend 18 tests, types and build pass; Python 321 pass
+(7 verification gates open by design). End-to-end: `--no-ai --case=hot` served
+the Batch 002 page in 0.3 s with the template briefing; HUP stopped engine and
+app with no orphans. Remaining: the merge/PR step below needs an explicit yes.
+Local note: Herd's `php` symlink points to a missing php82; php85 works.
+
+Original status: review done, fixes approved by @cfpramod. Continue
 on a laptop where `php artisan test` runs (the cloud container could not
 install PHP packages). Branch facts: feat/build-integration is fully contained
 in this branch (fast-forward, no conflicts). There is no `main` on GitHub; the
