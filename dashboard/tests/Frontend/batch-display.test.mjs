@@ -313,9 +313,12 @@ void test('missing timing probabilities and ETAs remain unavailable with their b
         assert.equal(formatBaselTime(shipment.eta_p50), 'Unavailable');
         assert.equal(formatBaselTime(shipment.eta_p90), 'Unavailable');
         assert.ok(shipment.reason.length > 0);
+        const overBudget = record.product_temperature.some(
+            (t) => t.status === 'OBSERVED_BUDGET_EXCEEDED',
+        );
         assert.equal(
             actionLabel(record.recommendation.action),
-            'No forward action',
+            overBudget ? 'Quarantine · hold for QA review' : 'No forward action',
         );
     }
     assert.equal(incomingStatusLabel('MODELED'), 'Timing modeled');
@@ -347,10 +350,7 @@ void test('QA review stays distinct from logistics approval and release is never
         assessments[0].recommendation.requires_approval_by,
         'logistics',
     );
-    assert.equal(
-        assessments[1].recommendation.requires_approval_by,
-        'logistics',
-    );
+    assert.equal(assessments[1].recommendation.requires_approval_by, 'QA');
 });
 
 void test('presentation does not mutate recommendations, alternatives or any evidence', () => {

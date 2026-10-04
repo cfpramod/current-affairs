@@ -47,11 +47,11 @@ preparation can retry. API and Codex successes are reused without regenerating.
 
 Use pre-signed-in operator and QA browser profiles and open the chosen batch
 directly before the slide handoff. Rehearse accept and deny, then return to the
-operator to show the result and exact assessment history. The original Batch 002
-heat-evidence case has a null model recommendation: choosing Quarantine is a
-human decision from measured sample evidence, not a claimed ML recommendation.
-The separate historical replay computes BUFFER/EXPEDITE; select its engine
-database explicitly if those model actions are part of the deck.
+operator to show the result and exact assessment history. In both Batch 002
+cases the lot is over its temperature budget, so the model recommends Quarantine
+for QA first; expedite or reroute opens only after QA records the lot as
+potentially usable. The operator still requests the hold and QA accepts it.
+The separate historical replay computes BUFFER for Batch 001.
 
 ## Select the deck's case
 

@@ -51,7 +51,7 @@ if [ "$DEMO_CASE" != hot ]; then
         CASE_LABEL="Historical replay → computed BUFFER → operator decision"
     else
         BATCH_ID=operations-action-demo-v1-batch-002
-        CASE_LABEL="Historical replay → computed EXPEDITE → logistics review; QA still required"
+        CASE_LABEL="Historical replay → late shipment, overheated lot → computed QUARANTINE → QA, then logistics"
     fi
 fi
 

@@ -81,7 +81,8 @@
               "enum": [
                 "BUFFER",
                 "EXPEDITE",
-                "REROUTE"
+                "REROUTE",
+                "QUARANTINE"
               ],
               "type": "string"
             },

@@ -126,13 +126,15 @@ computes both actions without special cases or prescribed recommendations.
 | Batch suffix | Charge UTC | Supporting evidence | Computed action |
 | --- | --- | --- | --- |
 | batch-001 | 15:00 | 50 kg released and reserved for this 50 kg demand | BUFFER; operator approval |
-| batch-002 | 18:00 | Departed shipment, fresh stored weather, no reserved stock | EXPEDITE; logistics approval |
+| batch-002 | 18:00 | Departed shipment, no reserved stock, lot over its excursion budget | QUARANTINE; QA approval (EXPEDITE listed as the transport option after QA) |
 
 The second batch's baseline on-time probability is 0.3566; the assumed expedite
 alternative yields 1.0 in 10,000 seeded simulations. These are conditional model
 results, not measured performance or guaranteed arrival. Its ambient exposure
 proxy remains 1.0 for both alternatives: improved timing does not resolve cold-chain
-quality. Human QA review remains required and release authorization remains false.
+quality. Because the lot's sampled temperature exceeded its budget, the worker
+recommends QUARANTINE first (QA approves); transport spend waits for QA's
+prospect. Release authorization remains false.
 REROUTE stays unavailable because this profile has no evidence supporting transfer.
 
 Generated outputs are [operations-action-demo.json](../output/operations-action-demo.json)

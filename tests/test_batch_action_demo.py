@@ -44,8 +44,12 @@ def test_action_demo_preserves_acceptance_cases_and_serves_computed_actions(
 
     assert [record.recommendation.action for record in records] == [
         "BUFFER",
-        "EXPEDITE",
+        "QUARANTINE",
     ]
+    held = records[1].recommendation
+    assert held.requires_approval_by == "QA"
+    assert held.qa_review_required
+    assert "EXPEDITE" in [option.action for option in held.alternatives]
     assert dataset.dataset_id != acceptance.dataset_id
     client = TestClient(create_app(database))
     for record in records:

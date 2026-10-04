@@ -41,7 +41,7 @@ test('local Codex is used without an API key and its cached briefing is reused',
         ->and(BatchBriefing::query()->sole()->source)->toBe('codex');
     BatchBriefingAgent::assertNeverPrompted();
     Process::assertRan(fn ($process) => in_array('read-only', $process->command, true)
-        && str_contains($process->input, '"action":null')
+        && str_contains($process->input, '"action":"QUARANTINE"')
         && str_contains($process->input, '"complete_journey":false'));
     Process::assertRanTimes(fn ($process) => is_array($process->command), 1);
 });
@@ -102,7 +102,7 @@ test('without an API key the briefing is a template built from the stored eviden
 
     expect($briefing->source)->toBe('template')
         ->and($briefing->headline)->toBe('Over temperature budget: 148 of 120 min outside 2–8 °C')
-        ->and($briefing->summary)->toContain('The model supports no action from this evidence')
+        ->and($briefing->summary)->toContain('The model recommends QUARANTINE')
         ->and($briefing->qaNote)->not->toBeNull();
     BatchBriefingAgent::assertNeverPrompted();
 });
@@ -126,7 +126,7 @@ test('with an API key the LLM words the facts once and the briefing is reused', 
     BatchBriefingAgent::assertPromptedTimes(1);
     Process::assertNothingRan();
     BatchBriefingAgent::assertPrompted(fn (AgentPrompt $prompt): bool => $prompt->contains('"minutes_outside_range":148')
-        && $prompt->contains('"action":null'));
+        && $prompt->contains('"action":"QUARANTINE"'));
 });
 
 test('a provider error falls back to the template without storing anything', function () {

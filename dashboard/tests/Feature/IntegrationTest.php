@@ -99,7 +99,7 @@ test('batch selection fetches its latest stored assessment with the matching dat
             ->component('BatchAssessment')
             ->where('selectedBatchId', $selected['batch_id'])
             ->where('assessment', $selected)
-            ->where('assessment.recommendation.action', null)
+            ->where('assessment.recommendation.action', 'QUARANTINE')
             ->where('assessment.production_readiness.released_reserved_quantity_kg', 30)
             ->where('assessment.production_readiness.reservation_shortfall_kg', 20)
             ->where('unavailable', false)

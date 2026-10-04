@@ -813,3 +813,25 @@ def test_unknown_batch_and_dataset_fail_without_persisting_results(database):
             connection.execute("SELECT count(*) FROM batch_assessments").fetchone()[0]
             == 0
         )
+
+
+def test_an_observed_excursion_recommends_a_qa_hold_before_transport(database, demo):
+    records = [
+        analyze_batch(database, demo.dataset_id, batch.id, AT)
+        for batch in demo.batches[:4]
+    ]
+    exceeded = [
+        record
+        for record in records
+        if any(
+            t.status == "OBSERVED_BUDGET_EXCEEDED" for t in record.product_temperature
+        )
+        and record.as_of < record.production_readiness.planned_charge_at
+    ]
+    assert exceeded
+    for record in exceeded:
+        assert record.recommendation.action == "QUARANTINE"
+        assert record.recommendation.requires_approval_by == "QA"
+        assert record.recommendation.qa_review_required
+        assert record.recommendation.qa_release_authorized is False
+        assert "QA" in record.recommendation.reason

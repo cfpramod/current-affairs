@@ -52,7 +52,7 @@ test('the batch list summarises readiness and temperature from stored assessment
             ->where('batches.1.reactor', 'R2')
             ->where('batches.1.answers.arrival.verdict', 'at_risk')
             ->where('batches.1.answers.quality.verdict', 'no')
-            ->where('batches.1.recommendation.action', null)
+            ->where('batches.1.recommendation.action', 'QUARANTINE')
             ->where('batches.0.retrospective', true),
         );
 });
@@ -134,7 +134,7 @@ test('an operator quarantine request waits for QA and keeps the exact assessment
     expect($decision->status)->toBe(BatchDecisionStatus::Pending)
         ->and($decision->required_role)->toBe(UserRole::Qa)
         ->and($decision->action)->toBe(ShipmentAction::Quarantine)
-        ->and($decision->model_action)->toBeNull()
+        ->and($decision->model_action)->toBe(ShipmentAction::Quarantine)
         ->and($decision->assessment_id)->toBe(hotAssessmentId())
         ->and($decision->assessment['product_temperature'][0]['status'])->toBe('OBSERVED_BUDGET_EXCEEDED');
 });

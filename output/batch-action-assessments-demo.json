@@ -234,7 +234,7 @@
     ]
   },
   {
-    "assessment_id": "b62b24662a8871c70176ce9a1312c48664327c76f307ad98ef68d17f4a1bf8a1",
+    "assessment_id": "a0b2ca20bee6c0a27e9991b9265827e0770a8bb4d589fc39fffceca114b66ae7",
     "dataset_id": "operations-action-demo-v1",
     "batch_id": "operations-action-demo-v1-batch-002",
     "shipment_ids": [
@@ -726,9 +726,9 @@
       }
     ],
     "recommendation": {
-      "action": "EXPEDITE",
-      "reason": "EXPEDITE: production continuity 1.000, incoming on-time arrival 1.000, cold-chain exposure proxy risk 1.000, incoming mean lateness 0.0 min. It meets the production continuity target 0.950; eligible shipment interventions meeting that target are compared by lower exposure proxy, lower incoming lateness, then higher on-time arrival. Production timing is conditional on material quantity and subsequent human QA release; it is not a production authorization. Human QA review is required; no automatic quarantine or release is inferred.",
-      "requires_approval_by": "logistics",
+      "action": "QUARANTINE",
+      "reason": "Sampled product temperature exceeded the excursion budget (operations-action-demo-v1-shipment-002). Hold the lot for QA review before any transport spend; expedite or reroute only if QA finds it potentially usable. The hold takes effect only when a person requests it and QA accepts; no release is inferred.",
+      "requires_approval_by": "QA",
       "qa_review_required": true,
       "alternatives": [
         {

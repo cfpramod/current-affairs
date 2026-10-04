@@ -50,7 +50,7 @@ Approved fixes, in order (all on this branch):
    contradicting the buffer case; `--fresh` rewrites tracked files in
    output/; retrospective check uses lte in the policy but lt in
    BuildBatchConsole/ListBatches.
-Known engine gap (found 2026-10-04, not fixed by decision of @cfpramod): the
+Engine gap (found and FIXED 2026-10-04: over-budget lots now get QUARANTINE first; see docs/decisions.md): the
 expedite case recommends EXPEDITE for a lot that is over its temperature budget.
 `_recommendation` in pipeline/baselhack/batch_assessment.py copies the logistics
 model's action and lets an excursion only set qa_review_required. The app's QA

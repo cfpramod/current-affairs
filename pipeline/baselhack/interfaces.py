@@ -447,6 +447,8 @@ class WeatherFeatures(Contract):
 
 ProvenanceKind = Literal["REAL", "OFFICIAL_FORECAST", "MODEL", "SIMULATED", "ASSUMED"]
 LogisticsAction = Literal["BUFFER", "EXPEDITE", "REROUTE"]
+# A batch may also be held for QA first: an observed excursion outranks transport.
+BatchAction = Literal["BUFFER", "EXPEDITE", "REROUTE", "QUARANTINE"]
 NavigationState = Literal["NORMAL", "WATCH", "RESTRICTED", "SEVERE", "UNKNOWN"]
 
 
@@ -1051,7 +1053,7 @@ class IncomingShipmentResult(Contract):
 class BatchRecommendation(Contract):
     """Human approval is mandatory; no automatic QA disposition or release."""
 
-    action: LogisticsAction | None
+    action: BatchAction | None
     reason: Text
     requires_approval_by: Role
     qa_review_required: bool

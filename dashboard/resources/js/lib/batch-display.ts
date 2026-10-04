@@ -92,6 +92,7 @@ export function actionLabel(action: BatchRecommendation['action']): string {
         BUFFER: 'BUFFER · use reserved stock',
         EXPEDITE: 'Expedite shipment (EXPEDITE)',
         REROUTE: 'Reroute shipment (REROUTE)',
+        QUARANTINE: 'Quarantine · hold for QA review',
     }[action];
 }
 

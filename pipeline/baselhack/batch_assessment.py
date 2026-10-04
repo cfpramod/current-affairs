@@ -173,12 +173,27 @@ def _recommendation(readiness, incoming, temperature, as_of):
             "Released reservations leave a quantity shortfall; incoming plans are prospective and require arrival plus human QA release. "
             + reason
         )
-    if qa_review:
+    exceeded = [
+        t.shipment_id for t in temperature if t.status == "OBSERVED_BUDGET_EXCEEDED"
+    ]
+    if exceeded:
+        # Moving or using a lot that is over its excursion budget wastes spend
+        # until QA has judged it; transport options stay listed for after QA.
+        action = "QUARANTINE"
+        reason = (
+            f"Sampled product temperature exceeded the excursion budget ({', '.join(exceeded)}). "
+            "Hold the lot for QA review before any transport spend; expedite or reroute only "
+            "if QA finds it potentially usable. The hold takes effect only when a person requests "
+            "it and QA accepts; no release is inferred."
+        )
+    elif qa_review:
         reason += " Human QA review is required; no automatic quarantine or release is inferred."
     return BatchRecommendation(
         action=action,
         reason=reason,
-        requires_approval_by="operator" if action == "BUFFER" else "logistics",
+        requires_approval_by={"BUFFER": "operator", "QUARANTINE": "QA"}.get(
+            action, "logistics"
+        ),
         qa_review_required=bool(qa_review),
         alternatives=alternatives,
     )

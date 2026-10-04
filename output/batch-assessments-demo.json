@@ -257,7 +257,7 @@
   },
   {
     "as_of": "2026-10-03T12:00:00Z",
-    "assessment_id": "55536dd64ac0df078c2c83241d7906a9bf7e6a519257bd2471d3c2753a455058",
+    "assessment_id": "00ce8511df77351a5369c48b25953a6ac1d2810ff3e27be8115b6f6c3855e080",
     "assumptions": {
       "destination": "Basel production site",
       "expedite_available": true,
@@ -501,12 +501,12 @@
       }
     ],
     "recommendation": {
-      "action": null,
+      "action": "QUARANTINE",
       "alternatives": [],
       "qa_release_authorized": false,
       "qa_review_required": true,
-      "reason": "Released reservations leave a quantity shortfall; incoming plans are prospective and require arrival plus human QA release. No supported aggregate action comparison is available; review quantities, incoming timing and QA evidence. Human QA review is required; no automatic quarantine or release is inferred.",
-      "requires_approval_by": "logistics"
+      "reason": "Sampled product temperature exceeded the excursion budget (operations-demo-v1-shipment-002). Hold the lot for QA review before any transport spend; expedite or reroute only if QA finds it potentially usable. The hold takes effect only when a person requests it and QA accepts; no release is inferred.",
+      "requires_approval_by": "QA"
     },
     "shipment_ids": [
       "operations-demo-v1-shipment-002"
