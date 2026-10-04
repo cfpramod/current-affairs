@@ -339,6 +339,7 @@ function resetDemo(): void {
                         <span class="font-medium">Reason (required)</span>
                         <textarea
                             v-model="submitForm.reason"
+                            data-test="decision-reason"
                             v-focus
                             v-demo-fill="fill('submit')"
                             rows="3"
@@ -362,6 +363,7 @@ function resetDemo(): void {
                                 submitForm.reason.trim() === '' ||
                                 submitForm.processing
                             "
+                            data-test="submit-decision"
                             @click="submit"
                         >
                             Submit {{ actionLabels[submitForm.action] }}
@@ -397,6 +399,7 @@ function resetDemo(): void {
                         <span class="font-medium">Reason (required)</span>
                         <textarea
                             v-model="reviewForm.reason"
+                            data-test="review-reason"
                             v-focus
                             v-demo-fill="
                                 fill(reviewForm.accept ? 'accept' : 'deny')
@@ -466,6 +469,7 @@ function resetDemo(): void {
                             >
                             <input
                                 v-model="reviewForm.next_action"
+                                data-test="review-next-action"
                                 v-demo-fill="fill('next')"
                                 class="rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                                 placeholder="e.g. Block lot 002, sample on arrival"
@@ -474,6 +478,7 @@ function resetDemo(): void {
                         <label class="flex items-center gap-2 text-sm">
                             <input
                                 v-model="reviewForm.responsibility_confirmed"
+                                data-test="review-confirm"
                                 type="checkbox"
                             />
                             My team will take this action.
@@ -498,6 +503,7 @@ function resetDemo(): void {
                                         !reviewForm.responsibility_confirmed)) ||
                                 reviewForm.processing
                             "
+                            data-test="submit-review"
                             @click="review"
                         >
                             {{

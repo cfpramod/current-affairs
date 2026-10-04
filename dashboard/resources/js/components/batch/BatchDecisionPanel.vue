@@ -210,6 +210,7 @@ const canReviewTransport = computed(
                         <Button
                             size="sm"
                             class="bg-sky-600 text-white hover:bg-sky-700 dark:bg-sky-500"
+                            data-test="accept-material"
                             @click="emit('review', activeMaterial, true)"
                         >
                             Accept
@@ -217,6 +218,7 @@ const canReviewTransport = computed(
                         <Button
                             size="sm"
                             variant="outline"
+                            data-test="deny-material"
                             @click="emit('review', activeMaterial, false)"
                         >
                             Deny
@@ -270,6 +272,7 @@ const canReviewTransport = computed(
                                     class="w-full"
                                     variant="outline"
                                     :disabled="!canChooseMaterial"
+                                    data-test="choose-quarantine"
                                     @click="emit('choose', 'QUARANTINE')"
                                 >
                                     Quarantine
