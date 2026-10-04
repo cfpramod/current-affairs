@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-<title id="title">Smartflow: from signals to decisions</title><desc id="desc">External signals and ERP demo records enter the data layer. The ML engine reads inputs and stores assessment JSON. The app reads assessments through an API and records human decisions in the audit store.</desc>
+<title id="title">Smartflow: from signals to decisions</title><desc id="desc">External signals and ERP demo records enter the data layer. The ML engine reads inputs and stores assessment JSON. The app reads assessments through an API, shows a plain-language briefing (AI words the facts; a template works without AI), and records human requests, acceptances and denials in the audit store.</desc>
 <defs>
 <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#091523"/><stop offset="1" stop-color="#102A35"/></linearGradient>
 <linearGradient id="teal" x2="1" y2="1"><stop stop-color="#123D45"/><stop offset="1" stop-color="#0C2935"/></linearGradient>
@@ -42,6 +42,8 @@
 <text x="1108" y="433" class="body">Latest applicable assessment</text>
 <text x="1108" y="464" class="body">Shipment &amp; batch context</text>
 <text x="1108" y="495" class="body">Evidence and decision history</text>
+<text x="1108" y="526" class="body">Plain-language briefing</text>
+<text x="1108" y="551" class="small">AI OR TEMPLATE · NEVER DECIDES</text>
 <rect x="1080" y="665" width="450" height="105" rx="22" fill="url(#teal)" stroke="#F7C977" stroke-opacity=".6" filter="url(#shadow)"/>
 <rect x="1104" y="690" width="5" height="28" rx="2.5" fill="#F7C977"/>
 <text x="1123" y="713" class="title">People decide</text>
@@ -64,11 +66,11 @@
 <text x="1224" y="604" class="small">Review &amp; decide</text>
 <path d="M1130 665 V565" fill="none" stroke="#F7C977" stroke-width="3" stroke-linejoin="round" marker-end="url(#gold)"/>
 <path d="M1080 525 H1037 Q1018 525 1018 544 V615 Q1018 633 1000 633 H723 Q705 633 705 650 V665" fill="none" stroke="#F7C977" stroke-width="3" stroke-linejoin="round" marker-end="url(#gold)"/>
-<text x="763" y="616" class="small">Record approval / override</text>
+<text x="763" y="616" class="small">Record accept / deny</text>
 <path d="M880 718 H980 Q1000 718 1000 700 V560 Q1000 550 1010 550 H1080" fill="none" stroke="#F7C977" stroke-width="3" stroke-linejoin="round" marker-end="url(#gold)"/>
 <rect x="70" y="735" width="310" height="35" rx="17" fill="#A78BFA" fill-opacity=".12"/>
 <text x="89" y="759" class="small">+ simulated sensor telemetry</text>
 <path d="M70 811H1530" stroke="#33525F"/>
 <text x="70" y="847" class="body">Rules recommend. ML supplies probabilities. People decide.</text>
-<text x="70" y="881" class="small">Conceptual data layer shown together; demo uses separate engine and app databases. Batch-linked latest results are being integrated.</text>
+<text x="70" y="881" class="small">Conceptual data layer shown together; demo uses separate engine and app databases. Operations are synthetic; river and weather data are real public records.</text>
 </svg>
