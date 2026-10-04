@@ -84,6 +84,12 @@ if [ ! -f .env ]; then
     cp env.example .env
 fi
 grep -q '^DATA_ENGINE_URL=' .env || printf '\nDATA_ENGINE_URL=http://127.0.0.1:%s\n' "$ENGINE_PORT" >> .env
+# Typing "." into an empty decision field types the prepared demo text.
+if grep -q '^SMARTFLOW_DEMO_AUTOFILL=' .env; then
+    sed -i.bak 's/^SMARTFLOW_DEMO_AUTOFILL=.*/SMARTFLOW_DEMO_AUTOFILL=true/' .env && rm -f .env.bak
+else
+    printf 'SMARTFLOW_DEMO_AUTOFILL=true\n' >> .env
+fi
 
 if [ ! -d vendor ]; then
     step "Installing PHP dependencies"
@@ -154,6 +160,7 @@ cat <<EOF
 Smartflow demo
   Logins (password: secret): operator@example.com · qa@example.com · logistics@example.com
   Hot day: Batches → Batch 002 → operator chooses Quarantine → QA accepts from the overview
+  Shortcut: type "." in an empty reason or next-action field to type the prepared text
   Between rehearsals: bash scripts/demo.sh --reset
 EOF
 

@@ -201,3 +201,15 @@ test('the demo reset command clears every batch decision', function () {
 
     expect(BatchDecision::query()->count())->toBe(0);
 });
+
+test('demo autofill is shared only when switched on', function (bool $enabled) {
+    config(['demo.autofill' => $enabled]);
+    fakeEngine();
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('batches.show', HOT_BATCH))
+        ->assertInertia(fn (Assert $page) => $page->where('demoAutofill', $enabled));
+})->with([
+    'off' => [false],
+    'on' => [true],
+]);

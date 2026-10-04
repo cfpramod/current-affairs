@@ -21,6 +21,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { demoText, vDemoFill } from '@/lib/demo-autofill';
+import type { DemoField } from '@/lib/demo-autofill';
 import { index } from '@/routes/batches';
 import type { ActionKey, BatchConsole } from '@/types/console';
 
@@ -36,6 +38,15 @@ defineOptions({
 const page = usePage();
 const role = computed(() => page.props.auth.user.role);
 const timezone = 'Europe/Zurich';
+
+/** Prepared text for a field when demo autofill is on, otherwise null. */
+function fill(field: DemoField): string | null {
+    if (!page.props.demoAutofill || !props.batch) {
+        return null;
+    }
+
+    return demoText(props.batch.batchId, field, submitForm.action);
+}
 
 const submitOpen = ref(false);
 const submitForm = useForm({
@@ -313,6 +324,7 @@ function resetDemo(): void {
                         <textarea
                             v-model="submitForm.reason"
                             v-focus
+                            v-demo-fill="fill('submit')"
                             rows="3"
                             class="rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                             placeholder="Why this action?"
@@ -366,6 +378,9 @@ function resetDemo(): void {
                         <textarea
                             v-model="reviewForm.reason"
                             v-focus
+                            v-demo-fill="
+                                fill(reviewForm.accept ? 'accept' : 'deny')
+                            "
                             rows="3"
                             class="rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                         />
@@ -377,6 +392,7 @@ function resetDemo(): void {
                             >
                             <input
                                 v-model="reviewForm.next_action"
+                                v-demo-fill="fill('next')"
                                 class="rounded-md border bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
                                 placeholder="e.g. Block lot 002, sample on arrival"
                             />
