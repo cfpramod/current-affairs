@@ -230,3 +230,12 @@ test('demo decisions can be reset', function () {
 
     expect(BatchDecision::query()->count())->toBe(0);
 });
+
+test('the demo reset command clears every batch decision', function () {
+    BatchDecision::factory()->create(['batch_id' => HOT_BATCH]);
+    BatchDecision::factory()->create(['batch_id' => 'operations-demo-v1-batch-003']);
+
+    $this->artisan('demo:reset')->expectsOutput('Cleared 2 batch decision(s).')->assertSuccessful();
+
+    expect(BatchDecision::query()->count())->toBe(0);
+});
