@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, Ship } from '@lucide/vue';
+import {
+    BookOpen,
+    ChartNoAxesColumn,
+    FlaskConical,
+    FolderGit2,
+    LayoutGrid,
+    ScanSearch,
+    Ship,
+} from '@lucide/vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,29 +23,35 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as batches } from '@/routes/batches';
 import { index as shipments } from '@/routes/shipments';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
-    {
-        title: 'Batch assessment',
-        href: '/integration/batches',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Logistics analysis',
-        href: '/integration',
-        icon: Ship,
-    },
     {
         title: 'Overview',
         href: dashboard(),
         icon: LayoutGrid,
     },
     {
+        title: 'Batches',
+        href: batches(),
+        icon: FlaskConical,
+    },
+    {
         title: 'Shipments',
         href: shipments(),
         icon: Ship,
+    },
+    {
+        title: 'Batch assessment',
+        href: '/integration/batches',
+        icon: ScanSearch,
+    },
+    {
+        title: 'Logistics analysis',
+        href: '/integration',
+        icon: ChartNoAxesColumn,
     },
 ];
 

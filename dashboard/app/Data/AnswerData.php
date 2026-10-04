@@ -9,7 +9,7 @@ use Spatie\LaravelData\Data;
 final class AnswerData extends Data
 {
     /**
-     * @param  'yes'|'no'|'at_risk'  $verdict
+     * @param  'yes'|'no'|'at_risk'|'unknown'  $verdict
      */
     public function __construct(
         public string $question,

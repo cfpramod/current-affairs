@@ -43,6 +43,7 @@ const verdictDot: Record<Verdict, string> = {
     yes: 'bg-emerald-500',
     no: 'bg-red-500',
     at_risk: 'bg-amber-500',
+    unknown: 'bg-muted-foreground/40',
 };
 </script>
 

@@ -1,3 +1,10 @@
+import type {
+    IncomingShipmentResult,
+    ProductTemperatureEvidence,
+    ProductionReadiness,
+    StoredBatchAssessment,
+} from '@/types/integration';
+
 export type ActionKey =
     | 'RUN_AS_PLANNED'
     | 'EXPEDITE'
@@ -7,7 +14,7 @@ export type ActionKey =
 
 export type Role = 'operator' | 'logistics' | 'qa';
 
-export type Verdict = 'yes' | 'no' | 'at_risk';
+export type Verdict = 'yes' | 'no' | 'at_risk' | 'unknown';
 
 export type EvidenceKind = 'real' | 'simulated' | 'unverified';
 
@@ -134,4 +141,61 @@ export type ShipmentOverview = {
     decisionsByAction: Record<ActionKey, number>;
     needsYou: ShipmentListItem[];
     nextCharges: ShipmentListItem[];
+};
+
+export type BatchDecisionStatus = 'pending' | 'accepted' | 'denied';
+
+export type BatchDecision = {
+    id: number;
+    assessmentId: string;
+    modelAction: ActionKey | null;
+    action: ActionKey;
+    requiredRole: Role;
+    status: BatchDecisionStatus;
+    submittedBy: string;
+    submittedReason: string;
+    submittedAt: string;
+    reviewedBy: string | null;
+    reviewReason: string | null;
+    nextAction: string | null;
+    responsibilityConfirmed: boolean;
+    reviewedAt: string | null;
+};
+
+export type BatchRecommendation = {
+    action: ActionKey | null;
+    reason: string;
+    approver: Role;
+    qaReviewRequired: boolean;
+};
+
+export type BatchListItem = {
+    batchId: string;
+    datasetId: string;
+    label: string;
+    reactor: string | null;
+    chargeAt: string;
+    asOf: string;
+    retrospective: boolean;
+    answers: { arrival: Answer; quality: Answer };
+    recommendation: BatchRecommendation;
+    decision: BatchDecision | null;
+};
+
+export type BatchTemperatureSeries = {
+    shipmentId: string;
+    points: TemperaturePoint[];
+    exposures: Exposure[];
+};
+
+export type BatchConsole = Omit<BatchListItem, 'decision'> & {
+    assessmentId: string;
+    production: ProductionReadiness;
+    incoming: IncomingShipmentResult[];
+    temperatures: ProductTemperatureEvidence[];
+    temperatureSeries: BatchTemperatureSeries[];
+    limitations: string[];
+    assessment: StoredBatchAssessment;
+    decisions: BatchDecision[];
+    activeDecision: BatchDecision | null;
 };

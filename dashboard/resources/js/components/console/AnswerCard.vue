@@ -22,6 +22,11 @@ const tone = computed(
                 text: 'text-amber-700 dark:text-amber-400',
                 ring: 'border-amber-500/50',
             },
+            unknown: {
+                word: 'UNKNOWN',
+                text: 'text-muted-foreground',
+                ring: 'border-dashed border-muted-foreground/40',
+            },
         })[props.answer.verdict],
 );
 </script>
