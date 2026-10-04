@@ -6,7 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Actions\Batches\BuildBatchConsole;
 use App\Actions\Batches\ListBatches;
+use App\Data\BatchConsoleData;
 use App\Exceptions\DataEngineUnavailable;
+use App\Exceptions\DecisionNotAllowed;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -32,11 +34,13 @@ final class BatchController extends Controller
         try {
             $console = $buildConsole->handle($batch);
         } catch (DataEngineUnavailable) {
-            return Inertia::render('batches/Show', ['batch' => null, 'unavailable' => true]);
+            return Inertia::render('batches/Show', ['batch' => null, 'unavailable' => true, 'problem' => null]);
+        } catch (DecisionNotAllowed $decisionNotAllowed) {
+            return Inertia::render('batches/Show', ['batch' => null, 'unavailable' => false, 'problem' => $decisionNotAllowed->getMessage()]);
         }
 
-        abort_if(! $console instanceof \App\Data\BatchConsoleData, 404);
+        abort_if(! $console instanceof BatchConsoleData, 404);
 
-        return Inertia::render('batches/Show', ['batch' => $console, 'unavailable' => false]);
+        return Inertia::render('batches/Show', ['batch' => $console, 'unavailable' => false, 'problem' => null]);
     }
 }

@@ -53,10 +53,10 @@ const HOT_BATCH = 'operations-demo-v1-batch-002';
 /**
  * Serve the team's stored demo assessments and operations from a fake engine.
  */
-function fakeEngine(?array $customAssessments = null): void
+function fakeEngine(?array $customAssessments = null, ?array $customOperations = null): void
 {
     $assessments = $customAssessments ?? json_decode((string) file_get_contents(base_path('../output/batch-assessments-demo.json')), true, 512, JSON_THROW_ON_ERROR);
-    $operations = json_decode((string) file_get_contents(base_path('../output/operations-demo.json')), true, 512, JSON_THROW_ON_ERROR);
+    $operations = $customOperations ?? json_decode((string) file_get_contents(base_path('../output/operations-demo.json')), true, 512, JSON_THROW_ON_ERROR);
 
     Http::fake(function (Request $request) use ($assessments, $operations) {
         $path = parse_url($request->url(), PHP_URL_PATH);

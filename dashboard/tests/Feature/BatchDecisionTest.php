@@ -65,6 +65,25 @@ test('the batch pages report an unreachable engine instead of failing', function
         ->assertInertia(fn (Assert $page) => $page->where('unavailable', true)->has('batches', 0));
 });
 
+test('a batch whose shipment has no lot linkage shows the problem instead of failing', function () {
+    $operations = json_decode((string) file_get_contents(base_path('../output/operations-demo.json')), true, 512, JSON_THROW_ON_ERROR);
+    $assessment = collect(json_decode((string) file_get_contents(base_path('../output/batch-assessments-demo.json')), true, 512, JSON_THROW_ON_ERROR))->firstWhere('batch_id', HOT_BATCH);
+    $operations['shipments'] = array_map(fn (array $shipment): array => in_array($shipment['id'], $assessment['shipment_ids'], true)
+        ? [...$shipment, 'lot_id' => null]
+        : $shipment, $operations['shipments']);
+    fakeEngine(customOperations: $operations);
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('batches.show', HOT_BATCH))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('batches/Show')
+            ->where('batch', null)
+            ->where('unavailable', false)
+            ->where('problem', fn (string $problem): bool => str_contains($problem, 'no verified lot linkage')),
+        );
+});
+
 test('an unknown batch is not found', function () {
     fakeEngine();
 

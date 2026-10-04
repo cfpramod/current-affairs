@@ -29,6 +29,7 @@ import type { ActionKey, BatchConsole, BatchDecision } from '@/types/console';
 const props = defineProps<{
     batch: BatchConsole | null;
     unavailable: boolean;
+    problem: string | null;
 }>();
 
 defineOptions({
@@ -142,7 +143,14 @@ function resetDemo(): void {
         <Head :title="batch ? batch.label : 'Batch'" />
 
         <div
-            v-if="unavailable || !batch"
+            v-if="problem"
+            class="rounded-xl border border-amber-500/60 p-5 text-sm"
+        >
+            This batch's stored assessment can't be shown: {{ problem }}
+        </div>
+
+        <div
+            v-else-if="unavailable || !batch"
             class="rounded-xl border border-amber-500/60 p-5 text-sm"
         >
             The data engine is unavailable, so this batch's stored assessment
